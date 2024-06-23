@@ -1,0 +1,72 @@
+plugins {
+    id("java-library")
+    id("net.minecrell.plugin-yml.paper") version "0.6.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+group = "cloud.grabsky"
+version = "1.21-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    // Repository for the Paper API.
+    maven { url = "https://repo.papermc.io/repository/maven-public/" }
+    // Repository containing the PacketEvents dependency.
+    maven { url = "https://repo.codemc.io/repository/maven-snapshots" }
+    // Repository containing the 'bedrock' dependency.
+    maven { url = "https://maven.pkg.github.com/grabsky/bedrock"; fillCredentials(it) }
+    // Repository containing the 'configuration' dependency.
+    maven { url = "https://maven.pkg.github.com/grabsky/configuration"; fillCredentials(it) }
+    // Repository containing the 'commands' dependency.
+    maven { url = "https://maven.pkg.github.com/grabsky/commands"; fillCredentials(it) }
+}
+
+dependencies {
+    // Lombok
+    compileOnly("org.projectlombok:lombok:1.18.32")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
+    // Paper
+    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+    // Dependencies
+    implementation("cloud.grabsky:bedrock:1.21-62")
+    implementation("cloud.grabsky:commands:1.20.1-37")
+    implementation("cloud.grabsky:configuration-paper:1.20.1-42")
+    implementation("com.github.retrooper:packetevents-spigot:2.3.1-SNAPSHOT")
+
+}
+
+tasks {
+    shadowJar { shadowJar.archiveFileName = "${rootProject.name}-${project.version}.jar" }
+    compileJava {
+        options.fork = true
+        options.compilerArgs += "--enable-preview"
+        // Setting compatibility to Java 21 (above should work too).
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
+
+paper {
+    main = "cloud.grabsky.tweaks.Tweaks"
+    apiVersion = "1.20"
+}
+
+/* FOR GITHUB ACTIONS */
+
+tasks.register("release") {
+    print("${version.toString().split('-')[0]} #${System.getenv("GITHUB_RUN_NUMBER")}")
+}
+
+tasks.register("tag") {
+    print(version)
+}
+
+/* UTILITY METHODS */
+
+private final def fillCredentials(final MavenArtifactRepository repository) {
+    repository.credentials {
+        username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
+        password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+    }
+}

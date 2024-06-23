@@ -1,0 +1,89 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2024 Grabsky <44530932+Grabsky@users.noreply.github.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * HORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package cloud.grabsky.tweaks.configuration;
+
+import cloud.grabsky.configuration.JsonConfiguration;
+import cloud.grabsky.configuration.JsonPath;
+import net.kyori.adventure.bossbar.BossBar;
+
+import org.jetbrains.annotations.ApiStatus.Internal;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Internal
+public final class PluginConfig implements JsonConfiguration {
+
+    // Enabled Tweaks
+
+    @JsonPath("enabled_modules.enhanced_clock")
+    public static boolean ENABLED_MODULES_ENHANCED_CLOCK;
+
+    @JsonPath("enabled_modules.enhanced_compass")
+    public static boolean ENABLED_MODULES_ENHANCED_COMPASS;
+
+    @JsonPath("enabled_modules.balanced_keep_inventory")
+    public static boolean ENABLED_MODULES_BALANCED_KEEP_INVENTORY;
+
+    @JsonPath("enabled_modules.magnet_enchantment")
+    public static boolean ENABLED_MODULES_MAGNET_ENCHANTMENT;
+
+    @JsonPath("enabled_modules.sonic_shield_enchantment")
+    public static boolean ENABLED_MODULES_SONIC_SHIELD_ENCHANTMENT;
+
+    // Compass Settings
+
+    @JsonPath("compass_settings.refresh_rate")
+    public static long COMPASS_SETTINGS_REFRESH_RATE;
+
+    @JsonPath("compass_settings.bossbar")
+    public static BossBarProperties COMPASS_SETTINGS_BOSSBAR;
+
+    // Clock Settings
+
+    @JsonPath("clock_settings.refresh_rate")
+    public static long CLOCK_SETTINGS_REFRESH_RATE;
+
+    @JsonPath("clock_settings.bossbar")
+    public static BossBarProperties CLOCK_SETTINGS_BOSSBAR;
+
+
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class BossBarProperties {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final BossBar.Color color;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final BossBar.Overlay overlay;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final String text;
+
+    }
+
+}

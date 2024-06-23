@@ -1,0 +1,21 @@
+{
+    "enabled_modules": {
+        "enhanced_clock": false,
+        "enhanced_compass": false,
+        "balanced_keep_inventory": false,
+        "magnet_enchantment": false,
+        "sonic_shield_enchantment": false
+    },
+    "compass_settings": {
+        // Refresh rate in ticks.
+        "refresh_rate": 3,
+        // BossBar to be displayed when player is holding compass.
+        "bossbar": { "overlay": "PROGRESS", "color": "YELLOW", "text": "<location_x> x     <location_y> ʏ     <location_z> ᴢ" }
+    },
+    "clock_settings": {
+        // Refresh rate in ticks.
+        "refresh_rate": 3,
+        // BossBar to be displayed when player is holding clock.
+        "bossbar": { "overlay": "PROGRESS", "color": "YELLOW", "text": "<time>" }
+    }
+}
