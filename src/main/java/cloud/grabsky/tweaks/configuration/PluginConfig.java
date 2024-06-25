@@ -53,6 +53,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.sonic_shield_enchantment")
     public static boolean ENABLED_MODULES_SONIC_SHIELD_ENCHANTMENT;
 
+    @JsonPath("enabled_modules.weaker_phantoms")
+    public static boolean ENABLED_MODULES_WEAKER_PHANTOMS;
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")

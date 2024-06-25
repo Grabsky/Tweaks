@@ -4,7 +4,8 @@
         "enhanced_compass": false,
         "balanced_keep_inventory": false,
         "magnet_enchantment": false,
-        "sonic_shield_enchantment": false
+        "sonic_shield_enchantment": false,
+        "weaker_phantoms": false
     },
     "compass_settings": {
         // Refresh rate in ticks.
