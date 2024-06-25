@@ -32,7 +32,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -62,8 +61,8 @@ public final class WeakerPhantomsHandler implements Module, Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPhantomSpawn(final @NotNull EntitySpawnEvent event) {
-        if (event.getEntity() instanceof Phantom phantom && event.getEntity().getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL)
+    public void onPhantomSpawn(final @NotNull CreatureSpawnEvent event) {
+        if (event.getEntity() instanceof Phantom phantom && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL)
             phantom.setHealth(phantom.getHealth() / 4);
     }
 
