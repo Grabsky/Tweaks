@@ -13,7 +13,7 @@ repositories {
     // Repository for the Paper API.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
     // Repository containing the PacketEvents dependency.
-    maven { url = "https://repo.codemc.io/repository/maven-snapshots" }
+    maven { url = "https://repo.codemc.io/repository/maven-releases" }
     // Repository containing the 'bedrock' dependency.
     maven { url = "https://maven.pkg.github.com/grabsky/bedrock"; fillCredentials(it) }
     // Repository containing the 'configuration' dependency.
@@ -32,7 +32,7 @@ dependencies {
     implementation("cloud.grabsky:bedrock:1.21-62")
     implementation("cloud.grabsky:commands:1.20.1-37")
     implementation("cloud.grabsky:configuration-paper:1.20.1-42")
-    implementation("com.github.retrooper:packetevents-spigot:2.3.1-SNAPSHOT")
+    implementation("com.github.retrooper:packetevents-spigot:2.4.0")
 
 }
 
@@ -55,11 +55,11 @@ paper {
 /* FOR GITHUB ACTIONS */
 
 tasks.register("release") {
-    print("${version.toString().split('-')[0]} #${System.getenv("GITHUB_RUN_NUMBER")}")
+    doLast { print("${version.toString().split('-')[0]} #${System.getenv("GITHUB_RUN_NUMBER")}") }
 }
 
 tasks.register("tag") {
-    print(version)
+    doLast { print(version) }
 }
 
 /* UTILITY METHODS */
