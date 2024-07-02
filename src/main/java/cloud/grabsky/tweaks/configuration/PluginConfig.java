@@ -56,6 +56,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.weaker_phantoms")
     public static boolean ENABLED_MODULES_WEAKER_PHANTOMS;
 
+    @JsonPath("enabled_modules.creeper_ignites_on_fire_damage")
+    public static boolean ENABLED_MODULES_CREEPER_IGNITES_ON_FIRE_DAMAGE;
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")

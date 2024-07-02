@@ -35,6 +35,7 @@ import cloud.grabsky.tweaks.enchantments.MagnetEnchantment;
 import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
+import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
 import cloud.grabsky.tweaks.handlers.KeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -65,7 +66,8 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new MagnetEnchantment(this),
                 new KeepInventoryHandler(this),
                 new SonicShieldEnchantment(this),
-                new WeakerPhantomsHandler(this)
+                new WeakerPhantomsHandler(this),
+                new CreeperIgniterHandler(this)
         );
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)
