@@ -43,7 +43,7 @@ public final class CampfireRegenerationHandler implements Module, Listener {
         this.task = plugin.getBedrockScheduler().repeat(0L, 200L, Long.MAX_VALUE, (_) -> {
             Bukkit.getOnlinePlayers().forEach(player -> {
                 // Skipping invulnerable players or players that are not in range of any campfire.
-                if (player.isInvulnerable() == true || isCampfireNearby(player.getLocation(), 3) == false)
+                if (player.isInvulnerable() == true || player.getGameMode().isInvulnerable() == true || isCampfireNearby(player.getLocation(), 3) == false)
                     return;
                 // Healing player by 1 HP.
                 player.heal(1.0, EntityRegainHealthEvent.RegainReason.CUSTOM);
@@ -51,6 +51,9 @@ public final class CampfireRegenerationHandler implements Module, Listener {
             return true;
         });
     }
+
+    @Override
+    public void unload() { /* HANDLED INSIDE LOAD */ }
 
     @SuppressWarnings("UnstableApiUsage")
     private boolean isCampfireNearby(final @NotNull Location location, final int radius) {
@@ -63,11 +66,6 @@ public final class CampfireRegenerationHandler implements Module, Listener {
             }
         }
         return false;
-    }
-
-    @Override
-    public void unload() {
-
     }
 
 }

@@ -61,9 +61,11 @@ public final class InvulnerableKeepInventoryHandler implements Module, Listener 
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
-        if (event.getPlayer().isInvulnerable() == true) {
+        if (event.getPlayer().isInvulnerable() == true || event.getPlayer().getGameMode().isInvulnerable() == true) {
             event.setKeepInventory(true);
+            event.setKeepLevel(true);
             event.getDrops().clear();
+            event.setDroppedExp(0);
         }
     }
 
