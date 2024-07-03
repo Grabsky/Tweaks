@@ -47,6 +47,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.balanced_keep_inventory")
     public static boolean ENABLED_MODULES_BALANCED_KEEP_INVENTORY;
 
+    @JsonPath("enabled_modules.invulnerable_players_keep_inventory")
+    public static boolean ENABLED_MODULES_INVULNERABLE_PLAYERS_KEEP_INVENTORY;
+
     @JsonPath("enabled_modules.magnet_enchantment")
     public static boolean ENABLED_MODULES_MAGNET_ENCHANTMENT;
 

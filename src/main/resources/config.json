@@ -3,6 +3,7 @@
         "enhanced_clock": false,
         "enhanced_compass": false,
         "balanced_keep_inventory": false,
+        "invulnerable_players_keep_inventory": false,
         "magnet_enchantment": false,
         "sonic_shield_enchantment": false,
         "weaker_phantoms": false,

@@ -37,7 +37,8 @@ import cloud.grabsky.tweaks.handlers.CampfireRegenerationHandler;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
 import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
-import cloud.grabsky.tweaks.handlers.KeepInventoryHandler;
+import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
+import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -65,7 +66,8 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new ClockHandler(this),
                 new CompassHandler(this),
                 new MagnetEnchantment(this),
-                new KeepInventoryHandler(this),
+                new BalancedKeepInventoryHandler(this),
+                new InvulnerableKeepInventoryHandler(this),
                 new SonicShieldEnchantment(this),
                 new WeakerPhantomsHandler(this),
                 new CreeperIgniterHandler(this),

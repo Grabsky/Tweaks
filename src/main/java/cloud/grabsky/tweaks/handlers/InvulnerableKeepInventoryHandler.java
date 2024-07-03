@@ -31,10 +31,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.PlayerInventory;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,16 +41,14 @@ import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class KeepInventoryHandler implements Module, Listener {
+public final class InvulnerableKeepInventoryHandler implements Module, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
-    private static final List<Integer> HOTBAR_SLOTS = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8);
-
     @Override
     public void load() {
-        if (PluginConfig.ENABLED_MODULES_BALANCED_KEEP_INVENTORY == true)
+        if (PluginConfig.ENABLED_MODULES_INVULNERABLE_PLAYERS_KEEP_INVENTORY == true)
             // Registering events.
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -67,15 +61,10 @@ public final class KeepInventoryHandler implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
-        final PlayerInventory inventory = event.getPlayer().getInventory();
-        // Keeping hotbar and equipped armor throughout deaths, excluding items currently held by the player in both hands.
-        Stream.concat(
-                Stream.of(inventory.getArmorContents()),
-                HOTBAR_SLOTS.stream().filter(slot -> inventory.getHeldItemSlot() != slot).map(inventory::getItem)
-        ).filter(item -> item != null && item.isEmpty() == false).forEach(item -> {
-            event.getItemsToKeep().add(item);
-            event.getDrops().remove(item);
-        });
+        if (event.getPlayer().isInvulnerable() == true) {
+            event.setKeepInventory(true);
+            event.getDrops().clear();
+        }
     }
 
 }
