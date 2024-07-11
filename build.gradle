@@ -12,7 +12,7 @@ repositories {
     mavenCentral()
     // Repository for the Paper API.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
-    // Repository containing the PacketEvents dependency.
+    // Repository containing the 'PacketEvents' dependency.
     maven { url = "https://repo.codemc.io/repository/maven-releases" }
     // Repository containing the 'bedrock' dependency.
     maven { url = "https://maven.pkg.github.com/grabsky/bedrock"; fillCredentials(it) }
@@ -28,11 +28,12 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.32")
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+    // PacketEvents
+    compileOnly("com.github.retrooper:packetevents-spigot:2.4.0")
     // Dependencies
     implementation("cloud.grabsky:bedrock:1.21-62")
     implementation("cloud.grabsky:commands:1.20.1-37")
     implementation("cloud.grabsky:configuration-paper:1.20.1-42")
-    implementation("com.github.retrooper:packetevents-spigot:2.4.0")
 
 }
 
@@ -50,6 +51,9 @@ tasks {
 paper {
     main = "cloud.grabsky.tweaks.Tweaks"
     apiVersion = "1.20"
+    serverDependencies {
+        "packetevents" { load = "BEFORE"; required = true }
+    }
 }
 
 /* FOR GITHUB ACTIONS */

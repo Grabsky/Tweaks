@@ -76,19 +76,27 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)
             this.getServer().shutdown();
+        // Initializing PacketEvents.
+        PacketEvents.getAPI().init();
         // Creating RootCommandManager instance.
         this.commands = new RootCommandManager(this);
         // Registering command(s).
         commands.registerDependency(Tweaks.class, this);
         commands.registerCommand(TweaksCommand.class);
-
     }
 
     @Override
     public void onLoad() {
-        // Initializing PacketEvents API.
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        // Applying settings to this PacketEvents API instance.
+        PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(true);
+        // Loading PacketHandlers.
         PacketEvents.getAPI().load();
+    }
+
+    @Override
+    public void onDisable() {
+        PacketEvents.getAPI().terminate();
     }
 
     @Override
@@ -105,8 +113,10 @@ public final class Tweaks extends BedrockPlugin implements Listener {
             // Returning true, as everything seemed to reload properly.
             return true;
         } catch (final IOException e) {
-            this.getLogger().severe("An error occurred while trying to reload the plugin.");
-            this.getLogger().severe("  " + e.getMessage());
+            this.getLogger().severe("Reloading of the plugin failed due to following error(s):");
+            this.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            if (e.getCause() != null)
+                this.getLogger().severe(" (2) " + e.getCause().getClass().getSimpleName() + ": " + e.getCause().getMessage());
             // Returning false, as plugin has failed to reload.
             return false;
         }
