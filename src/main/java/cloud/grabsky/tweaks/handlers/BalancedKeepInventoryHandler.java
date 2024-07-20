@@ -67,7 +67,7 @@ public final class BalancedKeepInventoryHandler implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
-        if (event.getPlayer().isInvulnerable() == false || event.getPlayer().getGameMode().isInvulnerable() == true) {
+        if (event.getPlayer().isInvulnerable() == false && event.getPlayer().getGameMode().isInvulnerable() == false) {
             final PlayerInventory inventory = event.getPlayer().getInventory();
             // Keeping hotbar and equipped armor throughout deaths, excluding items currently held by the player in both hands.
             Stream.concat(
