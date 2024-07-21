@@ -27,6 +27,7 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -77,6 +78,11 @@ public final class BalancedKeepInventoryHandler implements Module, Listener {
                 event.getItemsToKeep().add(item);
                 event.getDrops().remove(item);
             });
+            // Keeping off-hand slot throughout deaths.
+            if (inventory.getItemInOffHand().getType() != Material.AIR) {
+                event.getItemsToKeep().add(inventory.getItemInOffHand());
+                event.getDrops().remove(inventory.getItemInOffHand());
+            }
         }
     }
 
