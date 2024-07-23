@@ -2,6 +2,7 @@
     "enabled_modules": {
         "enhanced_clock": false,
         "enhanced_compass": false,
+        "enhanced_map": false,
         "balanced_keep_inventory": false,
         "invulnerable_players_keep_inventory": false,
         "magnet_enchantment": false,
@@ -22,5 +23,11 @@
         "refresh_rate": 3,
         // BossBar to be displayed when player is holding clock.
         "bossbar": { "overlay": "PROGRESS", "color": "YELLOW", "text": "<time>" }
+    },
+    "map_settings": {
+        // Refresh rate in ticks.
+        "refresh_rate": 5,
+        // BossBar to be displayed when player is holding map.
+        "bossbar": { "overlay": "PROGRESS", "color": "YELLOW", "text": "<biome>" }
     }
 }

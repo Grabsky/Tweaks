@@ -44,6 +44,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.enhanced_compass")
     public static boolean ENABLED_MODULES_ENHANCED_COMPASS;
 
+    @JsonPath("enabled_modules.enhanced_map")
+    public static boolean ENABLED_MODULES_ENHANCED_MAP;
+
     @JsonPath("enabled_modules.balanced_keep_inventory")
     public static boolean ENABLED_MODULES_BALANCED_KEEP_INVENTORY;
 
@@ -83,6 +86,14 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("clock_settings.bossbar")
     public static BossBarProperties CLOCK_SETTINGS_BOSSBAR;
+
+    // Map Settings
+
+    @JsonPath("map_settings.refresh_rate")
+    public static long MAP_SETTINGS_REFRESH_RATE;
+
+    @JsonPath("map_settings.bossbar")
+    public static BossBarProperties MAP_SETTINGS_BOSSBAR;
 
 
 
