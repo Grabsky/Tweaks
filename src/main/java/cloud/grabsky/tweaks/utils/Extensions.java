@@ -69,7 +69,7 @@ public final class Extensions {
     public static boolean hasSpace(final @NotNull Inventory inventory, final @NotNull ItemStack item) {
         if (inventory.firstEmpty() == -1) {
             final Iterator<ItemStack> iterator = List.of(inventory.getStorageContents()).iterator();
-            while (inventory.iterator().hasNext() == true) {
+            while (iterator.hasNext() == true) {
                 final ItemStack next = iterator.next();
                 if (next.getType() == item.getType() && next.getAmount() + item.getAmount() <= next.getMaxStackSize())
                     return true;
