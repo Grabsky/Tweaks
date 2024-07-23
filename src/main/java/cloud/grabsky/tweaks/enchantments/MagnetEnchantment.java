@@ -86,7 +86,7 @@ public final class MagnetEnchantment implements Module, Listener {
         if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE) {
             final Block block = event.getBlock();
             // Checking if player is breaking an ore
-            if (MaterialTags.ORES.isTagged(block) == true) {
+            if (MaterialTags.ORES.isTagged(block) == true || MaterialTags.RAW_ORE_BLOCKS.isTagged(block) == true) {
                 final ItemStack tool = player.getInventory().getItemInMainHand();
                 // Checking if player's tool is enchanted with Magnetic enchantment (my way of storing enchantments)
                 if (tool.isEnchantedWith("firedot:magnet") == true) {
