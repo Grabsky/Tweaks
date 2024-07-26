@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
@@ -62,7 +64,7 @@ public final class ChairsHandler implements Module, Listener {
             if (block == null)
                 return;
             // Checking if block is any stairs.
-            if (Tag.STAIRS.isTagged(block.getType()) == true) {
+            if (Tag.STAIRS.isTagged(block.getType()) == true && block.getBlockData() instanceof Stairs stairs && stairs.getHalf() == Bisected.Half.BOTTOM) {
                 block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
                     it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
                     it.setPersistent(false);
