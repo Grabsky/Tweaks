@@ -65,6 +65,9 @@ public final class ChairsHandler implements Module, Listener {
                 return;
             // Checking if block is any stairs.
             if (Tag.STAIRS.isTagged(block.getType()) == true && block.getBlockData() instanceof Stairs stairs && stairs.getHalf() == Bisected.Half.BOTTOM) {
+                // Cancelling the event...
+                event.setCancelled(true);
+                // Spawning block display entity and adding player as a passenger.
                 block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
                     it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
                     it.setPersistent(false);
