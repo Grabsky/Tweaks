@@ -10,7 +10,8 @@
         "weaker_phantoms": false,
         "creeper_ignites_on_fire_damage": false,
         "campfire_regeneration": false,
-        "ender_portal_frame_mini_game": false
+        "ender_portal_frame_mini_game": false,
+        "chairs": false
     },
     "compass_settings": {
         // Refresh rate in ticks.

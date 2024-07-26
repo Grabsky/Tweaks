@@ -71,6 +71,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.ender_portal_frame_mini_game")
     public static boolean ENABLED_MODULES_ENDER_PORTAL_FRAME_MINI_GAME;
 
+    @JsonPath("enabled_modules.chairs")
+    public static boolean ENABLED_MODULES_CHAIRS;
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")
