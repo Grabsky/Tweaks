@@ -6,6 +6,7 @@ import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
 import io.papermc.paper.event.block.BlockBreakBlockEvent;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -25,6 +26,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Vector;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +60,7 @@ public final class ChairsHandler implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInteract(final @NotNull PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getHand() == EquipmentSlot.HAND && event.isBlockInHand() == false) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getHand() == EquipmentSlot.HAND && event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR) {
             final @Nullable Block block = event.getClickedBlock();
             // Should never happen but we should satisfy code analyzer.
             if (block == null)
@@ -71,7 +73,16 @@ public final class ChairsHandler implements Module, Listener {
                 block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
                     it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
                     it.setPersistent(false);
+                    // Getting direction of the stairs. Multiplying by -2 to to get the opposite.
+                    final Vector direction = stairs.getFacing().getDirection().multiply(-2);
+                    // Creating new location which player will be teleported to. Only difference would be in the direction itself.
+                    final Location location = event.getPlayer().getLocation().setDirection(direction);
+                    // "Teleporting" player to the new location, which effectively just sets direction the player is looking at.
+                    event.getPlayer().teleport(location);
+                    // Adding player as a passenger.
                     it.addPassenger(event.getPlayer());
+                    // Swinging player's hand as to rotate their body.
+                    event.getPlayer().swingMainHand();
                 });
             }
         }
