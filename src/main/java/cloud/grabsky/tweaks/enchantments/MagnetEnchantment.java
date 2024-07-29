@@ -90,19 +90,22 @@ public final class MagnetEnchantment implements Module, Listener {
                 final ItemStack tool = player.getInventory().getItemInMainHand();
                 // Checking if player's tool is enchanted with Magnetic enchantment (my way of storing enchantments)
                 if (tool.isEnchantedWith("firedot:magnet") == true) {
+                    // Getting the experience player would get from destroying this block.
+                    final int experience = event.getExpToDrop();
+                    // Disabling vanilla drop of experience, will be added to the player in the next step.
+                    event.setExpToDrop(0);
+                    // Dropping experience directly at the player's location to make them pick it up instantly.
+                    if (experience != 0) player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
+                        orb.setExperience(experience);
+                    });
                     // Getting drops; Ores drop only one ItemStack, so we can safely get the first element from the Collection
                     event.getBlock().getDrops(tool).forEach(drop -> {
                         // Checking if player has space for an item
                         if (player.getInventory().hasSpace(drop) == true) {
-                            final int experience = event.getExpToDrop();
                             // Setting drops to false as player has enough space for an item
                             event.setDropItems(false);
-                            event.setExpToDrop(0);
                             // Adding drops directly to the player's inventory.
                             player.getInventory().addItem(drop);
-                            if (experience != 0) player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
-                                orb.setExperience(experience);
-                            });
                             // Creating next entity identifier for use with packets.
                             final int id = Bukkit.getUnsafe().nextEntityId();
                             // Doing packet stuff... asynchronously.
