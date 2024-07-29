@@ -60,6 +60,10 @@ public final class ChairsHandler implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInteract(final @NotNull PlayerInteractEvent event) {
+        // Skipping when player is already sitting in a vehicle. Need to test if both checks are needed.
+        if (event.getPlayer().isInsideVehicle() == true || event.getPlayer().getVehicle() != null)
+            return;
+        // ...
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getHand() == EquipmentSlot.HAND && event.getPlayer().getInventory().getItemInMainHand().getType() == Material.AIR) {
             final @Nullable Block block = event.getClickedBlock();
             // Should never happen but we should satisfy code analyzer.
