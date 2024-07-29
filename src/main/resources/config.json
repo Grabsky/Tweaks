@@ -11,7 +11,8 @@
         "creeper_ignites_on_fire_damage": false,
         "campfire_regeneration": false,
         "ender_portal_frame_mini_game": false,
-        "chairs": false
+        "chairs": false,
+        "armor_stand_spawns_with_arms": false
     },
     "compass_settings": {
         // Refresh rate in ticks.

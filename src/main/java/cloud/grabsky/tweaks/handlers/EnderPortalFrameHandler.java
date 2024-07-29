@@ -69,7 +69,7 @@ public final class EnderPortalFrameHandler implements Module, Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerDeath(final @NotNull PlayerInteractEvent event) {
+    public void onInteract(final @NotNull PlayerInteractEvent event) {
         if (event.getItem() == null || event.getItem().getType() != Material.ENDER_EYE)
             return;
         if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.END_PORTAL_FRAME) {
