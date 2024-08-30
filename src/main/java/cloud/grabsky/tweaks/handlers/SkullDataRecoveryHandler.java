@@ -27,6 +27,7 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import org.bukkit.GameMode;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Skull;
 import org.bukkit.event.EventHandler;
@@ -69,23 +70,28 @@ public final class SkullDataRecoveryHandler implements Module, Listener {
     @EventHandler(ignoreCancelled = true)
     public void onSkullPlace(final @NotNull BlockPlaceEvent event) {
         if (event.canBuild() == true && event.getBlock().getState() instanceof Skull state) {
-            final byte[] bytes = event.getItemInHand().serializeAsBytes();
+            // Cloning the item player is currently holding in their hand.
+            final ItemStack item = event.getItemInHand().clone();
+            // Setting stack size of the cloned item to 1.
+            item.setAmount(1);
+            // Serializing to bytes.
+            final byte[] bytes = item.serializeAsBytes();
             // Setting the data.
             state.getPersistentDataContainer().set(SKULL_DATA_KEY, PersistentDataType.BYTE_ARRAY, bytes);
             // Updating the state.
-            state.update();
+            state.update(true);
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onSkullBreak(final @NotNull BlockBreakEvent event) {
-        if (event.getBlock().getState() instanceof Skull state && event.isDropItems() == true) {
+        if (event.getBlock().getState() instanceof Skull state && event.isDropItems() == true && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
             if (state.getPersistentDataContainer().has(SKULL_DATA_KEY) == true) {
                 final byte[] bytes = state.getPersistentDataContainer().get(SKULL_DATA_KEY, PersistentDataType.BYTE_ARRAY);
                 // Removing drops.
                 event.setExpToDrop(0);
                 event.setDropItems(false);
-                // Deserializing item from PDC.
+                // Deserializing the item.
                 final ItemStack item = ItemStack.deserializeBytes(bytes);
                 // Dropping the item.
                 event.getBlock().getWorld().dropItem(event.getBlock().getLocation().add(0.5, 0.5, 0.5), item);
