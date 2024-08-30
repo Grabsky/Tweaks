@@ -12,7 +12,8 @@
         "campfire_regeneration": false,
         "ender_portal_frame_mini_game": false,
         "chairs": false,
-        "armor_stand_spawns_with_arms": false
+        "armor_stand_spawns_with_arms": false,
+        "skull_data_recovery": false
     },
     "compass_settings": {
         // Refresh rate in ticks.

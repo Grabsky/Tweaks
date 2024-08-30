@@ -34,6 +34,7 @@ import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.enchantments.MagnetEnchantment;
 import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
+import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.CampfireRegenerationHandler;
 import cloud.grabsky.tweaks.handlers.ChairsHandler;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
@@ -41,8 +42,8 @@ import cloud.grabsky.tweaks.handlers.CompassHandler;
 import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
 import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
-import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
+import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
@@ -79,7 +80,8 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new CampfireRegenerationHandler(this),
                 new EnderPortalFrameHandler(this),
                 new ChairsHandler(this),
-                new ArmorStandHandler(this)
+                new ArmorStandHandler(this),
+                new SkullDataRecoveryHandler(this)
         );
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)

@@ -77,6 +77,10 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.armor_stand_spawns_with_arms")
     public static boolean ENABLED_MODULES_ARMOR_STAND_SPAWNS_WITH_ARMS;
 
+    @JsonPath("enabled_modules.skull_data_recovery")
+    public static boolean ENABLED_MODULES_SKULL_DATA_RECOVERY;
+
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")
