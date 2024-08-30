@@ -79,7 +79,7 @@ public final class SkullDataRecoveryHandler implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSkullBreak(final @NotNull BlockBreakEvent event) {
-        if (event.getBlock().getState() instanceof Skull state) {
+        if (event.getBlock().getState() instanceof Skull state && event.isDropItems() == true) {
             if (state.getPersistentDataContainer().has(SKULL_DATA_KEY) == true) {
                 final byte[] bytes = state.getPersistentDataContainer().get(SKULL_DATA_KEY, PersistentDataType.BYTE_ARRAY);
                 // Removing drops.
