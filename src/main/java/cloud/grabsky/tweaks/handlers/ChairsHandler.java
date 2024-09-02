@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.BlockDisplay;
@@ -71,6 +72,8 @@ public final class ChairsHandler implements Module, Listener {
                 return;
             // Checking if block is any stairs.
             if (Tag.STAIRS.isTagged(block.getType()) == true && block.getBlockData() instanceof Stairs stairs && stairs.getHalf() == Bisected.Half.BOTTOM) {
+                if (event.getBlockFace() != BlockFace.UP && event.getBlockFace() != stairs.getFacing().getOppositeFace())
+                    return;
                 // Cancelling the event...
                 event.setCancelled(true);
                 // Spawning block display entity and adding player as a passenger.
