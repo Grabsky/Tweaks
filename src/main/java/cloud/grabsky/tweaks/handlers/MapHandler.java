@@ -33,6 +33,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -88,8 +89,13 @@ public final class MapHandler implements Module, Listener {
                     return BossBar.bossBar(Component.empty(), 0.0F, PluginConfig.MAP_SETTINGS_BOSSBAR.getColor(), PluginConfig.MAP_SETTINGS_BOSSBAR.getOverlay());
                 });
                 if (player.getInventory().getItemInMainHand().getType() == Material.FILLED_MAP || player.getInventory().getItemInOffHand().getType() == Material.FILLED_MAP) {
-                    final Component biome = Component.translatable(player.getWorld().getBiome(player.getLocation()).translationKey());
-                    final Component text = MiniMessage.miniMessage().deserialize(PluginConfig.MAP_SETTINGS_BOSSBAR.getText(), Placeholder.component("biome", biome));
+                    // Getting the NamespacedKey object containing the biome key. It must be done via UnsafeValues interface for compatibility with custom biomes.
+                    final NamespacedKey biomeKey = Bukkit.getUnsafe().getBiomeKey(player.getWorld(), (int) player.getX(), (int) player.getY(), (int) player.getZ());
+                    // Deserializing bossbar name to a Component
+                    final Component text = MiniMessage.miniMessage().deserialize(
+                            PluginConfig.MAP_SETTINGS_BOSSBAR.getText(),
+                            Placeholder.component("biome", Component.translatable("biome." + biomeKey.key() + "." + biomeKey.value()))
+                    );
                     // Updating the name in case different.
                     if (bar.name().equals(text) == false)
                         bar.name(text);
