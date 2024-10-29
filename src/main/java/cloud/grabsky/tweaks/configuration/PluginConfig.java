@@ -36,7 +36,18 @@ import lombok.RequiredArgsConstructor;
 @Internal
 public final class PluginConfig implements JsonConfiguration {
 
-    // Enabled Tweaks
+    // Enabled Modules > Enchantments
+
+    @JsonPath("enabled_modules.magnet_enchantment")
+    public static boolean ENABLED_MODULES_MAGNET_ENCHANTMENT;
+
+    @JsonPath("enabled_modules.sonic_shield_enchantment")
+    public static boolean ENABLED_MODULES_SONIC_SHIELD_ENCHANTMENT;
+
+    @JsonPath("enabled_modules.bait_enchantment")
+    public static boolean ENABLED_MODULES_BAIT_ENCHANTMENT;
+
+    // Enabled Modules > Enhanced Items
 
     @JsonPath("enabled_modules.enhanced_clock")
     public static boolean ENABLED_MODULES_ENHANCED_CLOCK;
@@ -47,17 +58,20 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.enhanced_map")
     public static boolean ENABLED_MODULES_ENHANCED_MAP;
 
+    // Enabled Modules > Chairs
+
+    @JsonPath("enabled_modules.chairs")
+    public static boolean ENABLED_MODULES_CHAIRS;
+
+    // Enabled Modules > Inventory Rules
+
     @JsonPath("enabled_modules.balanced_keep_inventory")
     public static boolean ENABLED_MODULES_BALANCED_KEEP_INVENTORY;
 
     @JsonPath("enabled_modules.invulnerable_players_keep_inventory")
     public static boolean ENABLED_MODULES_INVULNERABLE_PLAYERS_KEEP_INVENTORY;
 
-    @JsonPath("enabled_modules.magnet_enchantment")
-    public static boolean ENABLED_MODULES_MAGNET_ENCHANTMENT;
-
-    @JsonPath("enabled_modules.sonic_shield_enchantment")
-    public static boolean ENABLED_MODULES_SONIC_SHIELD_ENCHANTMENT;
+    // Enabled Modules > Other
 
     @JsonPath("enabled_modules.weaker_phantoms")
     public static boolean ENABLED_MODULES_WEAKER_PHANTOMS;
@@ -70,9 +84,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("enabled_modules.ender_portal_frame_mini_game")
     public static boolean ENABLED_MODULES_ENDER_PORTAL_FRAME_MINI_GAME;
-
-    @JsonPath("enabled_modules.chairs")
-    public static boolean ENABLED_MODULES_CHAIRS;
 
     @JsonPath("enabled_modules.armor_stand_spawns_with_arms")
     public static boolean ENABLED_MODULES_ARMOR_STAND_SPAWNS_WITH_ARMS;

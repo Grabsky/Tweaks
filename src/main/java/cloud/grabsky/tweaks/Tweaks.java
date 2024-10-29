@@ -31,6 +31,7 @@ import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import cloud.grabsky.tweaks.command.TweaksCommand;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
+import cloud.grabsky.tweaks.enchantments.BaitEnchantment;
 import cloud.grabsky.tweaks.enchantments.MagnetEnchantment;
 import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
@@ -68,18 +69,24 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         this.mapper = PaperConfigurationMapper.create();
         // Adding module(s) to a list.
         this.modules = List.of(
-                new ClockHandler(this),
-                new CompassHandler(this),
-                new MapHandler(this),
+                // Enchantments
+                new SonicShieldEnchantment(this),
                 new MagnetEnchantment(this),
+                new BaitEnchantment(this),
+                // Enhanced Items
+                new CompassHandler(this),
+                new ClockHandler(this),
+                new MapHandler(this),
+                // Inventory Rules
                 new BalancedKeepInventoryHandler(this),
                 new InvulnerableKeepInventoryHandler(this),
-                new SonicShieldEnchantment(this),
+                // Chairs
+                new ChairsHandler(this),
+                // Other
                 new WeakerPhantomsHandler(this),
                 new CreeperIgniterHandler(this),
                 new CampfireRegenerationHandler(this),
                 new EnderPortalFrameHandler(this),
-                new ChairsHandler(this),
                 new ArmorStandHandler(this),
                 new SkullDataRecoveryHandler(this)
         );
