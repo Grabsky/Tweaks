@@ -26,6 +26,9 @@ package cloud.grabsky.tweaks.configuration;
 import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonPath;
 import net.kyori.adventure.bossbar.BossBar;
+import org.bukkit.NamespacedKey;
+
+import java.util.List;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 
@@ -62,6 +65,11 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("enabled_modules.chairs")
     public static boolean ENABLED_MODULES_CHAIRS;
+
+    // Enabled Modules > Basket
+
+    @JsonPath("enabled_modules.basket")
+    public static boolean ENABLED_MODULES_BASKET;
 
     // Enabled Modules > Inventory Rules
 
@@ -115,6 +123,11 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("map_settings.bossbar")
     public static BossBarProperties MAP_SETTINGS_BOSSBAR;
+
+    // Basket Settings
+
+    @JsonPath("basket_settings.allowed_mobs")
+    public static List<NamespacedKey> BASKET_SETTINGS_ALLOWED_MOBS;
 
 
 
