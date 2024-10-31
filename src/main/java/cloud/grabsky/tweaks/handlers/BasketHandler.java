@@ -84,7 +84,7 @@ public final class BasketHandler implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(final @NotNull PlayerInteractEntityEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getRightClicked() instanceof Mob entity) {
+        if (event.getHand() == EquipmentSlot.HAND && event.getRightClicked() instanceof Mob entity && entity.isInsideVehicle() == false && entity.getPassengers().isEmpty() == true) {
             // Checking if player has ANY basket in their hand.
             if (event.getPlayer().getInventory().getItemInMainHand().getPersistentDataContainer().has(DATA_KEY) == true) {
                 // Cancelling the event because otherwise player would be able to eg. spawn baby variants of entities, which is not supported.
@@ -128,7 +128,7 @@ public final class BasketHandler implements Module, Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteract(final @NotNull PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.HAND) {
-            if (event.getItem() != null && event.getItem().getPersistentDataContainer().has(DATA_KEY) == true) {
+            if (event.getItem() != null && event.getItem().getPersistentDataContainer().has(DATA_KEY, PersistentDataType.BYTE_ARRAY) == true) {
                 // Getting serialized data of entity stored by this item.
                 final byte[] data = event.getItem().getPersistentDataContainer().getOrDefault(DATA_KEY, PersistentDataType.BYTE_ARRAY, new byte[0]);
                 // Continuing for non-existent / empty values.
