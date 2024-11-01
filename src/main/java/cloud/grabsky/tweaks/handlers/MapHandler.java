@@ -90,11 +90,12 @@ public final class MapHandler implements Module, Listener {
                 });
                 if (player.getInventory().getItemInMainHand().getType() == Material.FILLED_MAP || player.getInventory().getItemInOffHand().getType() == Material.FILLED_MAP) {
                     // Getting the NamespacedKey object containing the biome key. It must be done via UnsafeValues interface for compatibility with custom biomes.
-                    final NamespacedKey biomeKey = Bukkit.getUnsafe().getBiomeKey(player.getWorld(), (int) player.getX(), (int) player.getY(), (int) player.getZ());
+                    final NamespacedKey biomeKey = player.getLocation().getWorld().getBiome(player.getLocation()).getKey();
+                    System.out.println(biomeKey);
                     // Deserializing bossbar name to a Component
                     final Component text = MiniMessage.miniMessage().deserialize(
                             PluginConfig.MAP_SETTINGS_BOSSBAR.getText(),
-                            Placeholder.component("biome", Component.translatable("biome." + biomeKey.key() + "." + biomeKey.value()))
+                            Placeholder.component("biome", Component.translatable("biome." + biomeKey.namespace() + "." + biomeKey.value()))
                     );
                     // Updating the name in case different.
                     if (bar.name().equals(text) == false)
