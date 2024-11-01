@@ -84,7 +84,6 @@ public final class CampfireHandler implements Module, Listener {
         // Scheduling the campfire tracker task. It runs every second.
         this.campfireTrackerTask = plugin.getBedrockScheduler().repeatAsync(0L, 20L, Long.MAX_VALUE, (_) -> {
             for (final Player player : Bukkit.getOnlinePlayers()) {
-                System.out.println(player.getLocation().getBlock().getLightFromSky());
                 if (isCampfireNearby(player.getLocation(), 2) == true) {
                     if (campfireTrackerStorage.contains(player.getUniqueId()) == false)
                         campfireTrackerStorage.add(player.getUniqueId());
