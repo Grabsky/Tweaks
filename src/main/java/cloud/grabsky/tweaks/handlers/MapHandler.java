@@ -91,7 +91,6 @@ public final class MapHandler implements Module, Listener {
                 if (player.getInventory().getItemInMainHand().getType() == Material.FILLED_MAP || player.getInventory().getItemInOffHand().getType() == Material.FILLED_MAP) {
                     // Getting the NamespacedKey object containing the biome key. It must be done via UnsafeValues interface for compatibility with custom biomes.
                     final NamespacedKey biomeKey = player.getLocation().getWorld().getBiome(player.getLocation()).getKey();
-                    System.out.println(biomeKey);
                     // Deserializing bossbar name to a Component
                     final Component text = MiniMessage.miniMessage().deserialize(
                             PluginConfig.MAP_SETTINGS_BOSSBAR.getText(),
