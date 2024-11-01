@@ -19,6 +19,7 @@
         "weaker_phantoms": false,
         "creeper_ignites_on_fire_damage": false,
         "campfire_regeneration": false,
+        "campfire_prevents_mob_tracking": false,
         "ender_portal_frame_mini_game": false,
         "armor_stand_spawns_with_arms": false,
         "skull_data_recovery": false

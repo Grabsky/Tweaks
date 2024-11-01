@@ -37,7 +37,7 @@ import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
 import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.BasketHandler;
-import cloud.grabsky.tweaks.handlers.CampfireRegenerationHandler;
+import cloud.grabsky.tweaks.handlers.CampfireHandler;
 import cloud.grabsky.tweaks.handlers.ChairsHandler;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
@@ -88,7 +88,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 // Other
                 new WeakerPhantomsHandler(this),
                 new CreeperIgniterHandler(this),
-                new CampfireRegenerationHandler(this),
+                new CampfireHandler(this),
                 new EnderPortalFrameHandler(this),
                 new ArmorStandHandler(this),
                 new SkullDataRecoveryHandler(this)

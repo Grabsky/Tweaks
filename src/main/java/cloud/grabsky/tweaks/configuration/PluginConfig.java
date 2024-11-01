@@ -90,6 +90,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.campfire_regeneration")
     public static boolean ENABLED_MODULES_CAMPFIRE_REGENERATION;
 
+    @JsonPath("enabled_modules.campfire_prevents_mob_tracking")
+    public static boolean ENABLED_MODULES_CAMPFIRE_PREVENTS_MOB_TRACKING;
+
     @JsonPath("enabled_modules.ender_portal_frame_mini_game")
     public static boolean ENABLED_MODULES_ENDER_PORTAL_FRAME_MINI_GAME;
 
