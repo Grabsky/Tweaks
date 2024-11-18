@@ -66,7 +66,6 @@ public final class BaitEnchantment implements Module, Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFishingCaughtEntity(final @NotNull PlayerFishEvent event) {
-        System.out.println(event.getState());
         if (event.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
             final EquipmentSlot slot = event.getHand();
             // Checking if item associated with this event is enchanted with 'firedot:bait' enchantment.
