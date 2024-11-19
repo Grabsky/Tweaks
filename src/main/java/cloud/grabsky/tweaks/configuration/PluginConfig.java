@@ -41,11 +41,14 @@ public final class PluginConfig implements JsonConfiguration {
 
     // Enabled Modules > Enchantments
 
-    @JsonPath("enabled_modules.magnet_enchantment")
-    public static boolean ENABLED_MODULES_MAGNET_ENCHANTMENT;
-
     @JsonPath("enabled_modules.sonic_shield_enchantment")
     public static boolean ENABLED_MODULES_SONIC_SHIELD_ENCHANTMENT;
+
+    @JsonPath("enabled_modules.moon_light_enchantment")
+    public static boolean ENABLED_MODULES_MOON_LIGHT_ENCHANTMENT;
+
+    @JsonPath("enabled_modules.magnet_enchantment")
+    public static boolean ENABLED_MODULES_MAGNET_ENCHANTMENT;
 
     @JsonPath("enabled_modules.bait_enchantment")
     public static boolean ENABLED_MODULES_BAIT_ENCHANTMENT;

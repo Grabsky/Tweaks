@@ -33,6 +33,7 @@ import cloud.grabsky.tweaks.command.TweaksCommand;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.enchantments.BaitEnchantment;
 import cloud.grabsky.tweaks.enchantments.MagnetEnchantment;
+import cloud.grabsky.tweaks.enchantments.MoonLightEnchantment;
 import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
 import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
@@ -72,6 +73,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         this.modules = List.of(
                 // Enchantments
                 new SonicShieldEnchantment(this),
+                new MoonLightEnchantment(this),
                 new MagnetEnchantment(this),
                 new BaitEnchantment(this),
                 // Enhanced Items
