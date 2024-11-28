@@ -110,8 +110,7 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
                 // Getting the map of last uses on a
                 final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, DataType.asHashMap(DataType.UUID, DataType.LONG), new HashMap<>());
                 // Cancelling the event if player is on cooldown.
-                if (lastUnlock.getOrDefault(uniqueId, 0L) + (cooldown * 1000) > System.currentTimeMillis()) {
-                    event.getPlayer().sendMessage("You're on cooldown!");
+                if (System.currentTimeMillis() - lastUnlock.getOrDefault(uniqueId, 0L) < cooldown * 1000) {
                     event.setCancelled(true);
                     return;
                 }
