@@ -22,7 +22,8 @@
         "campfire_prevents_mob_tracking": false,
         "ender_portal_frame_mini_game": false,
         "armor_stand_spawns_with_arms": false,
-        "skull_data_recovery": false
+        "skull_data_recovery": false,
+        "reusable_vaults": false
     },
     "compass_settings": {
         // Refresh rate in ticks.
@@ -81,5 +82,12 @@
             "minecraft:zombie_horse",
             "minecraft:zombie_villager"
         ]
+    },
+    "vaults_settings": {
+        // Cooldown to be applied on vault unlock. Vaults are identified by their loot-table key. In seconds.
+        "cooldowns": {
+            // "minecraft:chests/trial_chambers/reward": 43200,
+            // "minecraft:chests/trial_chambers/reward_ominous": 43200
+        }
     }
 }

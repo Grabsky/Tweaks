@@ -29,6 +29,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.NamespacedKey;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 
@@ -102,6 +103,8 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.skull_data_recovery")
     public static boolean ENABLED_MODULES_SKULL_DATA_RECOVERY;
 
+    @JsonPath("enabled_modules.reusable_vaults")
+    public static boolean ENABLED_MODULES_REUSABLE_VAULTS;
 
     // Compass Settings
 
@@ -132,6 +135,10 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("basket_settings.allowed_mobs")
     public static List<NamespacedKey> BASKET_SETTINGS_ALLOWED_MOBS;
 
+    // Vaults Settings
+
+    @JsonPath("vaults_settings.cooldowns")
+    public static Map<String, Long> VAULTS_SETTINGS_COOLDOWNS;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.

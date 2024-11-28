@@ -45,9 +45,11 @@ import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
 import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
+import cloud.grabsky.tweaks.handlers.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
 import com.github.retrooper.packetevents.PacketEvents;
+import de.tr7zw.changeme.nbtapi.NBT;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.event.Listener;
 
@@ -91,11 +93,17 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new CampfireHandler(this),
                 new EnderPortalFrameHandler(this),
                 new ArmorStandHandler(this),
-                new SkullDataRecoveryHandler(this)
+                new SkullDataRecoveryHandler(this),
+                new ReusableVaultsHandler(this)
         );
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)
             this.getServer().shutdown();
+        // Preloading Item NBT API and shutting the server down in case of a failure.
+        if (NBT.preloadApi() == false) {
+            this.getLogger().severe("An error occurred while initializing NBT-API. Shutting down the server.");
+            this.getServer().shutdown();
+        }
         // Initializing PacketEvents.
         PacketEvents.getAPI().init();
         // Creating RootCommandManager instance.
@@ -108,14 +116,13 @@ public final class Tweaks extends BedrockPlugin implements Listener {
     @Override
     public void onLoad() {
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        // Applying settings to this PacketEvents API instance.
-        PacketEvents.getAPI().getSettings().reEncodeByDefault(false).checkForUpdates(true);
-        // Loading PacketHandlers.
+        // Loading PacketEvents.
         PacketEvents.getAPI().load();
     }
 
     @Override
     public void onDisable() {
+        // Terminating PacketEvents.
         PacketEvents.getAPI().terminate();
     }
 
