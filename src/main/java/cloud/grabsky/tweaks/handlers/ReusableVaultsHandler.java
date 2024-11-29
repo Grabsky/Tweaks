@@ -98,10 +98,10 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
     @Override
     public void unload() { /* HANDLED INSIDE LOAD */ }
 
-    // NOTE: Most logic can eventually be moved to LootGenerateEvent once it's fixed. Report: https://github.com/PaperMC/Paper/issues/11680
+    // NOTE: Suggested alternative event here: https://github.com/PaperMC/Paper/discussions/11687
     // Due to lack of proper API, PlayerInteractEvent must be used for the time being with no better workaround.
     @EventHandler(ignoreCancelled = true)
-    public void onVaultPreOpen(final @NotNull PlayerInteractEvent event) {
+    public void onVaultUnlock(final @NotNull PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.VAULT) {
             final org.bukkit.block.data.type.Vault blockData = (org.bukkit.block.data.type.Vault) event.getClickedBlock().getBlockData();
             final org.bukkit.block.Vault blockState = (Vault) event.getClickedBlock().getState();
@@ -158,7 +158,9 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
         }
     }
 
-    @EventHandler(ignoreCancelled = true) // NOTE: Suggested alternative event here: https://github.com/PaperMC/Paper/discussions/11679
+    // NOTE: Suggested alternative event here: https://github.com/PaperMC/Paper/discussions/11679
+    // Due to lack of proper API, VaultDisplayItemEvent must be used for the time being with no better workaround.
+    @EventHandler(ignoreCancelled = true)
     public void onVaultDisplayItemEvent(final @NotNull VaultDisplayItemEvent event) {
         final org.bukkit.block.data.type.Vault blockData = (org.bukkit.block.data.type.Vault) event.getBlock().getBlockData();
         final org.bukkit.block.Vault blockState = (Vault) event.getBlock().getState();
@@ -192,7 +194,8 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
 
         private final @NotNull Tweaks plugin;
 
-        // Responsible for storing 'vault_cooldown' placeholders. They must be cached in some way or another because retrieving their
+        // Responsible for storing 'vault_cooldown' placeholders. These must be stored in some way or another because retrieving them is an immediate operation.
+        // NOTE: In case ConcurrentModificationException or similar issues happen, this can probably be changed to a ConcurrentMap instead.
         private final Map<String, String> cache = new HashMap<>();
 
         @Override
@@ -213,7 +216,6 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
         @Override
         public @Nullable String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
             if (params.startsWith("vault_cooldown_") == true && offlinePlayer instanceof Player player && player.isOnline() == true) {
-                System.out.println("Requested...");
                 // Getting the location part of the param.
                 final String[] part = params.replace("vault_cooldown_", "").split(";");
                 // Making sure it's of the correct length.
@@ -225,33 +227,34 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
                     final @Nullable World world = Bukkit.getWorlds().stream().filter(it -> it.getName().equals(part[3])).findFirst().orElse(null);
                     // Checking if all values exist.
                     if (x != null && y != null && z != null && world != null) {
-                        //
+                        // Creating Location instance from provided values.
                         final Location location = new Location(world, x, y, z);
-                        // ...
+                        // Checking if chunk is loaded and if block at the requested location is a vault.
                         if (location.isChunkLoaded() == false || location.getBlock().getType() != Material.VAULT)
-                            cache.put(player.getUniqueId() + "/" + params, "N/A");
-                        // ...
+                            return "N/A";
+                        // Scheduling stuff that needs to be done on the main thread.
                         plugin.getBedrockScheduler().run(1L, (_) -> {
                             final org.bukkit.block.Vault blockState = (Vault) location.getBlock().getState();
                             // Getting the loot-table of vault associated with the event.
                             final String lootTable = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.loot_table", "minecraft:chests/trial_chambers/reward"); });
-                            // Other stuff can be read on the
+                            // Skipping vaults that have no cooldown configured. This could be scheduled in the task below but returning early ensures no thread is created for no reason.
+                            if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
+                                return;
+                            // Scheduling stuff that can be done outside of the main thread.
                             plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                                // Skipping vaults that have no cooldown configured.
-                                if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
-                                    return;
                                 // Getting the cooldown for this vault. Multiplying by 1000 to convert seconds to milliseconds.
                                 final long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.get(lootTable) * 1000;
                                 // Getting the map of players that unlocked the vault.
                                 final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
-                                // ...
+                                // Calculating the cooldown that is left on the vault.
                                 final Interval difference = Interval.between(lastUnlock.getOrDefault(player.getUniqueId(), 0L) + cooldown, System.currentTimeMillis(), Unit.MILLISECONDS);
-                                // ...
+                                // Updating the cached placeholder.
                                 cache.put(player.getUniqueId() + "/" + params, (difference.as(Unit.MILLISECONDS) > 0) ? difference.toString() : "");
                             });
                         });
                     }
                 }
+                // Returning the value from cache.
                 return cache.getOrDefault(player.getUniqueId() + "/" + params, "");
             }
             return null;
