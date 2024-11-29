@@ -152,6 +152,9 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
         final double activationRange = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.activation_range", 4.0); });
         // Getting the cooldown for this vault.
         final long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.getOrDefault(lootTable, Long.MAX_VALUE);
+        // Skipping vaults that have no cooldown configured.
+        if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
+            return;
         // Getting the map of players that unlocked the vault.
         final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
         // Iterating over the list of all players in range of vault and checking if all of them are on cooldown.
