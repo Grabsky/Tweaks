@@ -40,6 +40,8 @@ import org.bukkit.event.block.VaultDisplayItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -61,6 +63,7 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
     public @NotNull Tweaks plugin;
 
     private static final NamespacedKey VAULT_DATA_LAST_UNLOCK = new NamespacedKey("tweaks", "vault_data/last_unlock");
+    private static final PersistentDataType<PersistentDataContainer, HashMap<UUID, Long>> HASH_MAP_UUID_TO_LONG = DataType.asHashMap(DataType.UUID, DataType.LONG);
 
     @Override
     public void load() {
@@ -108,7 +111,7 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
                     return;
                 final Long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.get(lootTable);
                 // Getting the map of last uses on a
-                final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, DataType.asHashMap(DataType.UUID, DataType.LONG), new HashMap<>());
+                final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
                 // Cancelling the event if player is on cooldown.
                 if (System.currentTimeMillis() - lastUnlock.getOrDefault(uniqueId, 0L) < cooldown * 1000) {
                     event.setCancelled(true);
@@ -122,11 +125,11 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
                     // Using getAsString in second condition saves on screen space and improves code readability. (No inline cast)
                     if (firstState == State.ACTIVE && updatedBlockState.getBlockData().getAsString().contains("unlocking") == true) {
                         // Getting the updated map. In case it changed during this tick.
-                        final HashMap<UUID, Long> lastUnlockUpdated = updatedBlockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, DataType.asHashMap(DataType.UUID, DataType.LONG), new HashMap<>());
+                        final HashMap<UUID, Long> lastUnlockUpdated = updatedBlockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
                         // Applying cooldown to the player.
                         lastUnlockUpdated.put(uniqueId, System.currentTimeMillis());
                         // Updating map in the PDC.
-                        updatedBlockState.getPersistentDataContainer().set(VAULT_DATA_LAST_UNLOCK, DataType.asHashMap(DataType.UUID, DataType.LONG), lastUnlockUpdated);
+                        updatedBlockState.getPersistentDataContainer().set(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, lastUnlockUpdated);
                         // Updating the block state. Otherwise changes won't be applied.
                         updatedBlockState.update();
                     }
@@ -150,7 +153,7 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
         // Getting the cooldown for this vault.
         final long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.getOrDefault(lootTable, Long.MAX_VALUE);
         // Getting the map of players that unlocked the vault.
-        final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, DataType.asHashMap(DataType.UUID, DataType.LONG), new HashMap<>());
+        final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
         // Iterating over the list of all players in range of vault and checking if all of them are on cooldown.
         if (event.getBlock().getLocation().getNearbyPlayers(activationRange).stream().allMatch(it -> System.currentTimeMillis() - lastUnlock.getOrDefault(it.getUniqueId(), 0L) < cooldown * 1000) == true) {
             // Cancelling the event.
