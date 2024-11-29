@@ -23,15 +23,23 @@
  */
 package cloud.grabsky.tweaks.handlers;
 
+import cloud.grabsky.bedrock.util.Interval;
+import cloud.grabsky.bedrock.util.Interval.Unit;
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.jeff_media.morepersistentdatatypes.DataType;
 import de.tr7zw.changeme.nbtapi.NBT;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Vault;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -44,6 +52,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,6 +71,8 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
+    private @Nullable Expansion expansion;
+
     private static final NamespacedKey VAULT_DATA_LAST_UNLOCK = new NamespacedKey("tweaks", "vault_data/last_unlock");
     private static final PersistentDataType<PersistentDataContainer, HashMap<UUID, Long>> HASH_MAP_UUID_TO_LONG = DataType.asHashMap(DataType.UUID, DataType.LONG);
 
@@ -69,6 +80,14 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
     public void load() {
         // Clearing handlers list.
         HandlerList.unregisterAll(this);
+        // Unregistering PAPI expansion.
+        if (plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI") == true) {
+            if (expansion != null && expansion.isRegistered() == true)
+                expansion.unregister();
+            // ...
+            expansion = new Expansion(plugin);
+            expansion.register();
+        }
         // Returning in case module is disabled.
         if (PluginConfig.ENABLED_MODULES_REUSABLE_VAULTS == false)
             return;
@@ -77,10 +96,7 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
     }
 
     @Override
-    public void unload() {
-        // Unregistering events.
-        HandlerList.unregisterAll(this);
-    }
+    public void unload() { /* HANDLED INSIDE LOAD */ }
 
     // NOTE: Most logic can eventually be moved to LootGenerateEvent once it's fixed. Report: https://github.com/PaperMC/Paper/issues/11680
     // Due to lack of proper API, PlayerInteractEvent must be used for the time being with no better workaround.
@@ -167,6 +183,89 @@ public final class ReusableVaultsHandler implements Module, Listener, PacketList
             blockState.setBlockData(blockData);
             // Updating the block state. Otherwise changes won't be applied.
             blockState.update();
+        }
+    }
+
+
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    private static final class Expansion extends PlaceholderExpansion {
+
+        private final @NotNull Tweaks plugin;
+
+        // Responsible for storing 'vault_cooldown' placeholders. They must be cached in some way or another because retrieving their
+        private final Map<String, String> cache = new HashMap<>();
+
+        @Override
+        public @NotNull String getIdentifier() {
+            return plugin.getName().toLowerCase();
+        }
+
+        @Override
+        public @NotNull String getAuthor() {
+            return "Grabsky";
+        }
+
+        @Override
+        public @NotNull String getVersion() {
+            return plugin.getPluginMeta().getVersion();
+        }
+
+        @Override
+        public @Nullable String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
+            if (params.startsWith("vault_cooldown_") == true && offlinePlayer instanceof Player player && player.isOnline() == true) {
+                System.out.println("Requested...");
+                // Getting the location part of the param.
+                final String[] part = params.replace("vault_cooldown_", "").split(";");
+                // Making sure it's of the correct length.
+                if (part.length == 4) {
+                    // Parsing location part to actual values.
+                    final @Nullable Double x = parseDouble(part[0]);
+                    final @Nullable Double y = parseDouble(part[1]);
+                    final @Nullable Double z = parseDouble(part[2]);
+                    final @Nullable World world = Bukkit.getWorlds().stream().filter(it -> it.getName().equals(part[3])).findFirst().orElse(null);
+                    // Checking if all values exist.
+                    if (x != null && y != null && z != null && world != null) {
+                        //
+                        final Location location = new Location(world, x, y, z);
+                        // ...
+                        if (location.isChunkLoaded() == false || location.getBlock().getType() != Material.VAULT)
+                            cache.put(player.getUniqueId() + "/" + params, "N/A");
+                        // ...
+                        plugin.getBedrockScheduler().run(1L, (_) -> {
+                            final org.bukkit.block.Vault blockState = (Vault) location.getBlock().getState();
+                            // Getting the loot-table of vault associated with the event.
+                            final String lootTable = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.loot_table", "minecraft:chests/trial_chambers/reward"); });
+                            // Other stuff can be read on the
+                            plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                                // Skipping vaults that have no cooldown configured.
+                                if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
+                                    return;
+                                // Getting the cooldown for this vault. Multiplying by 1000 to convert seconds to milliseconds.
+                                final long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.get(lootTable) * 1000;
+                                // Getting the map of players that unlocked the vault.
+                                final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
+                                // ...
+                                final Interval difference = Interval.between(lastUnlock.getOrDefault(player.getUniqueId(), 0L) + cooldown, System.currentTimeMillis(), Unit.MILLISECONDS);
+                                // ...
+                                cache.put(player.getUniqueId() + "/" + params, (difference.as(Unit.MILLISECONDS) > 0) ? difference.toString() : "");
+                            });
+                        });
+                    }
+                }
+                return cache.getOrDefault(player.getUniqueId() + "/" + params, "");
+            }
+            return null;
+        }
+    }
+
+
+    /* HELPER METHODS */
+
+    private static @Nullable Double parseDouble(final @NotNull String value) {
+        try {
+            return Double.parseDouble(value);
+        } catch (final NumberFormatException _) {
+            return null;
         }
     }
 
