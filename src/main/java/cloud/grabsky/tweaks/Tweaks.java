@@ -33,6 +33,7 @@ import cloud.grabsky.tweaks.handlers.ChairsHandler;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
 import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
+import cloud.grabsky.tweaks.handlers.DamageMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
@@ -85,7 +86,8 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new EnderPortalFrameHandler(this),
                 new ArmorStandHandler(this),
                 new SkullDataRecoveryHandler(this),
-                new ReusableVaultsHandler(this)
+                new ReusableVaultsHandler(this),
+                new DamageMultipliersHandler(this)
         );
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)

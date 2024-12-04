@@ -23,7 +23,8 @@
         "ender_portal_frame_mini_game": false,
         "armor_stand_spawns_with_arms": false,
         "skull_data_recovery": false,
-        "reusable_vaults": false
+        "reusable_vaults": false,
+        "damage_multipliers": false
     },
     "compass_settings": {
         // Refresh rate in ticks.
@@ -88,6 +89,16 @@
         "cooldowns": {
             // "minecraft:chests/trial_chambers/reward": 43200,
             // "minecraft:chests/trial_chambers/reward_ominous": 43200
+        }
+    },
+    "damage_multiplier_settings": {
+        // Entities that deals more (or less) damage.
+        "outgoing": {
+            // "minecraft:creaking": 2.0
+        },
+        // Entities that takes more (or less) damage.
+        "incoming": {
+            // "minecraft:chicken": 0.25
         }
     }
 }

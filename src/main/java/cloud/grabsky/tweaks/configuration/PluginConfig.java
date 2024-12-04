@@ -18,6 +18,7 @@ import cloud.grabsky.configuration.JsonConfiguration;
 import cloud.grabsky.configuration.JsonPath;
 import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
 
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.reusable_vaults")
     public static boolean ENABLED_MODULES_REUSABLE_VAULTS;
 
+    @JsonPath("enabled_modules.damage_multipliers")
+    public static boolean ENABLED_MODULES_DAMAGE_MULTIPLIERS;
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")
@@ -120,6 +124,14 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("map_settings.bossbar")
     public static BossBarProperties MAP_SETTINGS_BOSSBAR;
+
+    // Damage Multiplier Settings
+
+    @JsonPath("damage_multiplier_settings.outgoing")
+    public static Map<EntityType, Float>  DAMAGE_MULTIPLIER_SETTINGS_OUTGOING;
+
+    @JsonPath("damage_multiplier_settings.incoming")
+    public static Map<EntityType, Float>  DAMAGE_MULTIPLIER_SETTINGS_INCOMING;
 
     // Basket Settings
 
