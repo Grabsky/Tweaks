@@ -10,6 +10,8 @@ version = "1.21.4-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
 repositories {
     mavenLocal()
     mavenCentral()
+    // Repository for the Paper API. (Forked; contains VaultStateChangeEvent)
+    maven { url = "https://maven.pkg.github.com/grabsky/paper"; fillCredentials(it) }
     // Repository for the Paper API.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
     // Repository containing the 'PacketEvents' and 'Item-NBT-API' dependencies.
@@ -28,7 +30,7 @@ dependencies {
     // Lombok
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")
-    // Paper
+    // Paper (Forked; contains VaultStateChangeEvent)
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     // PacketEvents (Provided)
     compileOnly("com.github.retrooper:packetevents-spigot:2.6.0")
@@ -58,6 +60,7 @@ paper {
     main = "cloud.grabsky.tweaks.Tweaks"
     apiVersion = "1.21.4"
     serverDependencies {
+        "Azure"          { load = "BEFORE"; required = true }
         "packetevents"   { load = "BEFORE"; required = true }
         "PlaceholderAPI" { load = "BEFORE"; required = false }
     }
