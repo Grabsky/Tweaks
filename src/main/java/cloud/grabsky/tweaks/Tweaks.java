@@ -14,6 +14,7 @@
  */
 package cloud.grabsky.tweaks;
 
+import cloud.grabsky.bedrock.BedrockPlugin;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
 import cloud.grabsky.configuration.ConfigurationMapper;
@@ -50,7 +51,7 @@ import java.util.List;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
-public final class Tweaks extends TweaksBase implements Listener {
+public final class Tweaks extends BedrockPlugin implements Listener {
 
     private ConfigurationMapper mapper;
     private RootCommandManager commands;
