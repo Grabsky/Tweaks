@@ -15,8 +15,12 @@
 package cloud.grabsky.tweaks.configuration;
 
 import cloud.grabsky.configuration.JsonConfiguration;
+import cloud.grabsky.configuration.JsonNullable;
 import cloud.grabsky.configuration.JsonPath;
+import cloud.grabsky.tweaks.configuration.object.Particles;
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 
@@ -24,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
+import org.jetbrains.annotations.Nullable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -101,6 +106,11 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.damage_multipliers")
     public static boolean ENABLED_MODULES_DAMAGE_MULTIPLIERS;
 
+    // Enabled Modules > Items
+
+    @JsonPath("enabled_modules.scrolls")
+    public static boolean ENABLED_MODULES_SCROLLS;
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")
@@ -142,6 +152,39 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("vaults_settings.cooldowns")
     public static Map<String, Long> VAULTS_SETTINGS_COOLDOWNS;
+
+    // Teleportation Settings
+
+    @JsonPath("teleportation_settings.delay")
+    public static int TELEPORTATION_SETTINGS_DELAY;
+
+    @JsonPath("teleportation_settings.fade_in_fade_out_animation_translation")
+    public static String TELEPORTATION_SETTINGS_FADE_IN_FADE_OUT_ANIMATION_TRANSLATION;
+
+    @JsonNullable
+    @JsonPath("teleportation_settings.sounds.out")
+    public static @Nullable Sound TELEPORTATION_SETTINGS_SOUNDS_OUT;
+
+    @JsonNullable @JsonPath("teleportation_settings.sounds.in")
+    public static @Nullable Sound TELEPORTATION_SETTINGS_SOUNDS_IN;
+
+    @JsonNullable @JsonPath("teleportation_settings.particles")
+    public static @Nullable List<Particles> TELEPORTATION_SETTINGS_PARTICLES;
+
+    @JsonPath("teleportation_settings.lang.teleport_in_progress")
+    public static String TELEPORTATION_SETTINGS_LANG_TELEPORT_IN_PROGRESS;
+
+    @JsonPath("teleportation_settings.lang.teleport_success")
+    public static Component TELEPORTATION_SETTINGS_LANG_TELEPORT_SUCCESS;
+
+    @JsonPath("teleportation_settings.lang.teleport_failure_moved")
+    public static Component TELEPORTATION_SETTINGS_LANG_TELEPORT_FAILURE_MOVED;
+
+    @JsonPath("teleportation_settings.lang.teleport_failure_unknown")
+    public static Component TELEPORTATION_SETTINGS_LANG_TELEPORT_FAILURE_UNKNOWN;
+
+    @JsonPath("teleportation_settings.lang.teleport_failure_on_cooldown")
+    public static String TELEPORTATION_SETTINGS_LANG_TELEPORT_FAILURE_ON_COOLDOWN;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.

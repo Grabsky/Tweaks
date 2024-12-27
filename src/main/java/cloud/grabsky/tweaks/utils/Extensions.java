@@ -16,12 +16,18 @@ package cloud.grabsky.tweaks.utils;
 
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.TitlePart;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 
@@ -68,6 +74,20 @@ public final class Extensions {
             return false;
         }
         return true;
+    }
+
+    public static void showRichTitle(final @NotNull Audience audience, final @NotNull Component title, final @NotNull Component subtitle, final long fadeInTicks, final long stayTicks, final long fadeOutTicks) {
+        audience.showTitle(
+                Title.title(title, subtitle, Title.Times.times(
+                        Duration.of(fadeInTicks * 50, ChronoUnit.MILLIS),
+                        Duration.of(stayTicks * 50, ChronoUnit.MILLIS),
+                        Duration.of(fadeOutTicks * 50, ChronoUnit.MILLIS)
+                ))
+        );
+    }
+
+    public static void fadeOutTitle(final @NotNull Audience audience, final long delay, final long fadeOutTicks) {
+        audience.sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ZERO, Duration.of(delay * 50, ChronoUnit.MILLIS), Duration.of(fadeOutTicks * 50, ChronoUnit.MILLIS)));
     }
 
 }

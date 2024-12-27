@@ -24,7 +24,9 @@
         "armor_stand_spawns_with_arms": false,
         "skull_data_recovery": false,
         "reusable_vaults": false,
-        "damage_multipliers": false
+        "damage_multipliers": false,
+        // Items
+        "scrolls": false
     },
     "compass_settings": {
         // Refresh rate in ticks.
@@ -99,6 +101,31 @@
         // Entities that takes more (or less) damage.
         "incoming": {
             // "minecraft:chicken": 0.25
+        }
+    },
+    "teleportation_settings": {
+        // Delay before player is teleported. (in seconds)
+        "delay": 5,
+        // Fade-in-fade-out animation translation key. Setting this to blank string will disable the animation.
+        "fade_in_fade_out_animation_translation": "ui.util.black_screen",
+        // Sounds that are played to nearby players upon teleportation.
+        "sounds": {
+            "out": { "key": "firedot:teleport.out", "source": "player", "volume": 1.0, "pitch": 1.0 },
+            "in": { "key": "firedot:teleport.in", "source": "player", "volume": 1.0, "pitch": 1.0 }
+        },
+        // Particles that are displayed to nearby players upon teleportation.
+        "particles": [
+            { "particle": "WAX_OFF", "amount": 40, "speed": 0.3, "offset_x": 0.25,  "offset_y": 0.4, "offset_z": 0.25 },
+            { "particle": "WAX_ON", "amount": 40, "speed": 0.3, "offset_x": 0.25,  "offset_y": 0.4, "offset_z": 0.25 },
+            { "particle": "MYCELIUM", "amount": 120, "speed": 0.3, "offset_x": 0.25,  "offset_y": 0.4, "offset_z": 0.25 }
+        ],
+        // Translatable messages. These messages are displayed in action bar.
+        "lang": {
+            "teleport_in_progress": "<gray>Zostaniesz przeniesiony za <gold><delay><gray> sekund...",
+            "teleport_success": "<gray>Zostałeś przeniesiony w miejsce docelowe.",
+            "teleport_failure_moved": "<red>Teleportacja przerwana. Poruszyłeś się.",
+            "teleport_failure_unknown": "<red>Teleportacja przerwana. Spróbuj ponownie.",
+            "teleport_failure_on_cooldown": "<red>Poczekaj <gold><cooldown_left><red> przed kolejnym użyciem."
         }
     }
 }

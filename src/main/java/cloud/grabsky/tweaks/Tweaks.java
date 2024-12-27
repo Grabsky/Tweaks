@@ -40,26 +40,44 @@ import cloud.grabsky.tweaks.handlers.MapHandler;
 import cloud.grabsky.tweaks.handlers.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
+import cloud.grabsky.tweaks.items.ScrollItem;
 import com.github.retrooper.packetevents.PacketEvents;
 import de.tr7zw.changeme.nbtapi.NBT;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executor;
+
+import org.jetbrains.annotations.UnknownNullability;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
 public final class Tweaks extends BedrockPlugin implements Listener {
 
+    @Getter(AccessLevel.PUBLIC)
+    private static Tweaks instance;
+
     private ConfigurationMapper mapper;
     private RootCommandManager commands;
     private List<Module> modules;
 
+    // This can only be null before plugin has been fully enabled.
+    public static @UnknownNullability Executor MAIN_THREAD;
+
     @Override
     public void onEnable() {
         super.onEnable();
+        // Updating the instance of the plugin.
+        instance = this;
+        // Updating the main thread executor.
+        MAIN_THREAD = Bukkit.getScheduler().getMainThreadExecutor(this);
         // Creating ConfigurationMapper instance.
         this.mapper = PaperConfigurationMapper.create();
         // Adding module(s) to a list.
@@ -87,7 +105,9 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new ArmorStandHandler(this),
                 new SkullDataRecoveryHandler(this),
                 new ReusableVaultsHandler(this),
-                new DamageMultipliersHandler(this)
+                new DamageMultipliersHandler(this),
+                // Items
+                new ScrollItem(this)
         );
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)
