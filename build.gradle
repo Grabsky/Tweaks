@@ -10,7 +10,7 @@ version = "1.21.4-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
 repositories {
     mavenLocal()
     mavenCentral()
-    // Repository for the Paper API. (Forked; contains VaultStateChangeEvent)
+    // Repository containing the Paper API. (Forked; contains VaultStateChangeEvent)
     maven { url = "https://maven.pkg.github.com/0x46697265444F54/Fire"; fillCredentials(it) }
     // Repository containing the Paper API and its dependencies.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
@@ -19,11 +19,11 @@ repositories {
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     // Repository containing the 'bedrock' dependency.
-    maven { url = "https://maven.pkg.github.com/grabsky/bedrock"; fillCredentials(it) }
+    maven { url = "https://maven.pkg.github.com/Grabsky/bedrock"; fillCredentials(it) }
     // Repository containing the 'configuration' dependency.
-    maven { url = "https://maven.pkg.github.com/grabsky/configuration"; fillCredentials(it) }
+    maven { url = "https://maven.pkg.github.com/Grabsky/configuration"; fillCredentials(it) }
     // Repository containing the 'commands' dependency.
-    maven { url = "https://maven.pkg.github.com/grabsky/commands"; fillCredentials(it) }
+    maven { url = "https://maven.pkg.github.com/Grabsky/commands"; fillCredentials(it) }
 }
 
 dependencies {
