@@ -106,6 +106,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.damage_multipliers")
     public static boolean ENABLED_MODULES_DAMAGE_MULTIPLIERS;
 
+    @JsonPath("enabled_modules.improved_end_phantoms")
+    public static boolean ENABLED_MODULES_IMPROVED_END_PHANTOMS;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.scrolls")

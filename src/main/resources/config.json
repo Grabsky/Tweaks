@@ -25,6 +25,7 @@
         "skull_data_recovery": false,
         "reusable_vaults": false,
         "damage_multipliers": false,
+        "improved_end_phantoms": false,
         // Items
         "scrolls": false
     },

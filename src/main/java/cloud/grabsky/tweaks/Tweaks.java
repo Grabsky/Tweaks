@@ -37,6 +37,7 @@ import cloud.grabsky.tweaks.handlers.DamageMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
+import cloud.grabsky.tweaks.handlers.ImprovedEndPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
@@ -106,6 +107,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new SkullDataRecoveryHandler(this),
                 new ReusableVaultsHandler(this),
                 new DamageMultipliersHandler(this),
+                new ImprovedEndPhantomsHandler(this),
                 // Items
                 new ScrollItem(this)
         );
