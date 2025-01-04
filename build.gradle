@@ -46,11 +46,14 @@ dependencies {
     implementation("cloud.grabsky:configuration-paper:1.21.3-45")
     // Dependencies (Other Libraries) (Shaded)
     implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
-    implementation("de.tr7zw:item-nbt-api:2.14.1-SNAPSHOT")
+    implementation("de.tr7zw:item-nbt-api:2.14.1")
 }
 
 tasks {
-    shadowJar { shadowJar.archiveFileName = "${rootProject.name}-${project.version}.jar" }
+    shadowJar {
+        shadowJar.archiveFileName = "${rootProject.name}-${project.version}.jar"
+        relocate("de.tr7zw.changeme.nbtapi", "cloud.grabsky.tweaks.libs.nbt")
+    }
     compileJava {
         options.fork = true
         options.compilerArgs += "--enable-preview"
