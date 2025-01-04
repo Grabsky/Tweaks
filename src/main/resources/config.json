@@ -27,7 +27,8 @@
         "damage_multipliers": false,
         "improved_end_phantoms": false,
         // Items
-        "scrolls": false
+        "scrolls": false,
+        "enderite": false
     },
     "compass_settings": {
         // Refresh rate in ticks.
@@ -128,5 +129,21 @@
             "teleport_failure_unknown": "<red>Teleportacja przerwana. Spróbuj ponownie.",
             "teleport_failure_on_cooldown": "<red>Poczekaj <gold><cooldown_left><red> przed kolejnym użyciem."
         }
+    },
+    "enderite_settings": {
+        "base_models": [
+            "firedot:enderite/enderite_helmet",
+            "firedot:enderite/enderite_chestplate",
+            "firedot:enderite/enderite_leggings",
+            "firedot:enderite/enderite_boots",
+            "firedot:enderite/enderite_sword",
+            "firedot:enderite/enderite_pickaxe",
+            "firedot:enderite/enderite_axe",
+            "firedot:enderite/enderite_shovel",
+            "firedot:enderite/enderite_hoe"
+        ],
+        "addition_models": [
+            "firedot:enderite/enderite_ingot"
+        ]
     }
 }

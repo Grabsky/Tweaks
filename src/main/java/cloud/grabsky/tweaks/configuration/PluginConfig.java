@@ -114,6 +114,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.scrolls")
     public static boolean ENABLED_MODULES_SCROLLS;
 
+    @JsonPath("enabled_modules.enderite")
+    public static boolean ENABLED_MODULES_ENDERITE;
+
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")
@@ -188,6 +191,14 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("teleportation_settings.lang.teleport_failure_on_cooldown")
     public static String TELEPORTATION_SETTINGS_LANG_TELEPORT_FAILURE_ON_COOLDOWN;
+
+    // Enderite Settings
+
+    @JsonPath("enderite_settings.base_models")
+    public static List<NamespacedKey> ENDERITE_SETTINGS_BASE_MODELS;
+
+    @JsonPath("enderite_settings.addition_models")
+    public static List<NamespacedKey> ENDERITE_SETTINGS_ADDITION_MODELS;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.
