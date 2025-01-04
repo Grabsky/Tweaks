@@ -27,8 +27,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
@@ -78,9 +79,8 @@ public final class CampfireHandler implements Module, Listener {
                 if (isCampfireNearby(player.getLocation(), 2) == true) {
                     if (campfireTrackerStorage.contains(player.getUniqueId()) == false)
                         campfireTrackerStorage.add(player.getUniqueId());
-                } else if (campfireTrackerStorage.contains(player.getUniqueId()) == true) {
+                } else if (campfireTrackerStorage.contains(player.getUniqueId()) == true)
                     campfireTrackerStorage.remove(player.getUniqueId());
-                }
             }
             // ...
             return true;
@@ -88,7 +88,7 @@ public final class CampfireHandler implements Module, Listener {
         // Scheduling campfire regeneration task, if enabled.
         if (PluginConfig.ENABLED_MODULES_CAMPFIRE_REGENERATION == true) {
             // Scheduling the task. It runs every 10 seconds.
-            this.campfireRegenerationTask = plugin.getBedrockScheduler().repeat(0L, 200L, Long.MAX_VALUE, (_) -> {
+            this.campfireRegenerationTask = plugin.getBedrockScheduler().repeat(0L, 20L, Long.MAX_VALUE, (_) -> {
                 for (final Player player : Bukkit.getOnlinePlayers()) {
                     // Skipping if player is in the water.
                     if (player.isUnderWater() == true)
@@ -96,8 +96,8 @@ public final class CampfireHandler implements Module, Listener {
                     // Skipping invulnerable players or players that are not in range of any campfire.
                     if (player.isInvulnerable() == true || player.getGameMode().isInvulnerable() == true || campfireTrackerStorage.contains(player.getUniqueId()) == false)
                         continue;
-                    // Healing player by 1 HP.
-                    player.heal(1.0, EntityRegainHealthEvent.RegainReason.CUSTOM);
+                    // Adding regeneration effect. This should heal player by 1 HP every 50 ticks.
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 50, 0, true, false, true));
                 }
                 // ...
                 return true;
