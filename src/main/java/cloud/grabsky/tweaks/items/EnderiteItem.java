@@ -23,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +71,33 @@ public final class EnderiteItem implements Module, Listener {
                 return;
             // Setting result to null as to prevent repairing / combining base item with invalid addition item.
             event.setResult(null);
+        }
+    }
+
+    @EventHandler
+    public void onPrepareSmithingResult(final @NotNull PrepareSmithingEvent event) {
+        // Skipping calls that do not produce any result.
+        if (event.getResult() == null)
+            return;
+        // Getting items.
+        final @Nullable ItemStack equipment = event.getInventory().getInputEquipment();
+        // Continuing only if equipment is not null.
+        if (equipment != null) {
+            // Getting equipment model.
+            final @Nullable NamespacedKey equipmentModel = equipment.getItemMeta().getItemModel();
+            // Continuing only when equipment's model is also specified in the configured list.
+            if (equipmentModel != null && PluginConfig.ENDERITE_SETTINGS_BASE_MODELS.contains(equipmentModel) == true) {
+                final @Nullable ItemStack template = event.getInventory().getInputTemplate();
+                final @Nullable ItemStack mineral = event.getInventory().getInputMineral();
+                // Setting result to null as to prevent upgrading enderite equipment.
+                if (template != null && template.getItemMeta().getItemModel() != null) {
+                    event.setResult(null);
+                    return;
+                }
+                // Setting result to null as to prevent upgrading enderite equipment.
+                if (mineral != null && mineral.getItemMeta().getItemModel() != null)
+                    event.setResult(null);
+            }
         }
     }
 
