@@ -23,6 +23,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -199,6 +200,9 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("enderite_settings.addition_models")
     public static List<NamespacedKey> ENDERITE_SETTINGS_ADDITION_MODELS;
+
+    @JsonPath("enderite_settings.furnace_smelting_result")
+    public static ItemStack ENDERITE_SETTINGS_FURNACE_SMELTING_RESULT;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.

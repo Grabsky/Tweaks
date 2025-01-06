@@ -144,6 +144,13 @@
         ],
         "addition_models": [
             "firedot:enderite/enderite_ingot"
-        ]
+        ],
+        // Because recipe "priority" does not seem to work properly, result item must be set manually.
+        "furnace_smelting_result": {
+            "material": "turtle_scute",
+            "meta": {
+                "components": "[item_model=\"firedot:enderite/enderite_ingot\",item_name='{\"translate\":\"item.firedot.enderite_ingot\",\"fallback\":\"Enderite Ingot\"}']"
+            }
+        }
     }
 }

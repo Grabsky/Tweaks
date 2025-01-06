@@ -22,6 +22,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareSmithingEvent;
 import org.bukkit.inventory.ItemStack;
@@ -98,6 +99,21 @@ public final class EnderiteItem implements Module, Listener {
                 if (mineral != null && mineral.getItemMeta().getItemModel() != null)
                     event.setResult(null);
             }
+        }
+    }
+
+    @EventHandler
+    public void onFurnaceStartSmelt(final FurnaceSmeltEvent event) {
+        if (event.getRecipe() != null) {
+            final ItemStack smelting = event.getSource();
+            // Returning if smelting item is null or do not have an 'item_model' specified.
+            if (smelting.getItemMeta().hasItemModel() == false)
+                return;
+            // Getting the 'item_model' value of the smelting item.
+            final NamespacedKey smeltingModel = smelting.getItemMeta().getItemModel();
+            // Overriding the result if applicable.
+            if (PluginConfig.ENDERITE_SETTINGS_BASE_MODELS.contains(smeltingModel) == true)
+                event.setResult(PluginConfig.ENDERITE_SETTINGS_FURNACE_SMELTING_RESULT);
         }
     }
 
