@@ -23,12 +23,26 @@ import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
 import cloud.grabsky.tweaks.utils.TriConsumer;
 import cloud.grabsky.tweaks.utils.Utilities;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListener;
+import com.github.retrooper.packetevents.event.PacketListenerCommon;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.InteractionHand;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientInteractEntity;
+import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -52,7 +66,7 @@ import lombok.experimental.ExtensionMethod;
 @ExtensionMethod(Extensions.class)
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class ScrollItem implements Module, Listener {
+public final class ScrollItem implements Module, Listener, PacketListener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
@@ -64,6 +78,9 @@ public final class ScrollItem implements Module, Listener {
 
     // Players with this permission can teleport without paying any configured teleportation costs.
     private static final String BYPASS_TELEPORT_COST = "tweaks.plugin.bypass_teleport_cost";
+
+    // Holds a reference to packet listener registered by this module.
+    private PacketListenerCommon packetListener;
 
     // Stored as a separate runnable as this is also called on demand.
     private final TriConsumer<Player, Boolean, Boolean> taskConsumer = (it, isInitial, isForced) -> it.getInventory().forEach(item -> {
@@ -100,6 +117,9 @@ public final class ScrollItem implements Module, Listener {
     public void load() {
         // Clearing handlers list.
         HandlerList.unregisterAll(this);
+        // Unregister packet listeners, if exists.
+        if (this.packetListener != null)
+            PacketEvents.getAPI().getEventManager().unregisterListener(packetListener);
         // Cancelling current task in case it already exists.
         if (this.task != null)
             task.cancel();
@@ -107,6 +127,8 @@ public final class ScrollItem implements Module, Listener {
         if (PluginConfig.ENABLED_MODULES_SCROLLS == true) {
             // Registering events. Currently only the PlayerInventoryEvent is being listened to.
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
+            // Registering listeners for packet events.
+            this.packetListener = PacketEvents.getAPI().getEventManager().registerListener(this, PacketListenerPriority.NORMAL);
             // Scheduling repeating task which updates cooldown of scrolls in player inventories.
             this.task = plugin.getBedrockScheduler().repeat(0L, 20L, Long.MAX_VALUE, (_) -> {
                 // Running the task logic for each online player.
@@ -120,8 +142,34 @@ public final class ScrollItem implements Module, Listener {
     @Override
     public void unload() { /* HANDLED INSIDE LOAD */ }
 
-    @EventHandler
+    // NOTE: It sometimes works, and sometimes not. Not much else to be done. Should be good enough.
+    @Override
+    public void onPacketReceive(final PacketReceiveEvent event) {
+        if (event.getPacketType() == PacketType.Play.Client.INTERACT_ENTITY) {
+            final var packet = new WrapperPlayClientInteractEntity(event);
+            // Handling only right-click interactions initiated from the main hand.
+            if (packet.getAction() != WrapperPlayClientInteractEntity.InteractAction.ATTACK && packet.getHand() == InteractionHand.MAIN_HAND) {
+                // Getting the player associated with the event.
+                final Player player = event.getPlayer();
+                // Returning if player clicked on entity that is tracked by the server.
+                if (SpigotConversionUtil.getEntityById(player.getWorld(), packet.getEntityId()) != null)
+                    return;
+                // Cancelling the event if player have scroll in their hand.
+                if (player.getInventory().getItemInMainHand().getPersistentDataContainer().has(SCROLL_TYPE, PersistentDataType.STRING) == true)
+                    event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClick(final @NotNull PlayerInteractEvent event) {
+        // Returning if player clicked an entity.
+        if (event.getPlayer().getTargetEntity((int) event.getPlayer().getAttribute(Attribute.ENTITY_INTERACTION_RANGE).getValue()) != null)
+            return;
+        // Returning if clicked block is interactable.
+        if (event.getClickedBlock() != null && isInteractable(event.getClickedBlock()) == true)
+            return;
+        // Returning if clicked entity is not null.
         if (event.getHand() == EquipmentSlot.HAND && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) && event.getItem() != null) {
             // Getting player associated with the event.
             final Player player = event.getPlayer();
@@ -193,6 +241,61 @@ public final class ScrollItem implements Module, Listener {
                         .sendActionBar(player);
             }
         }
+    }
+
+    // Returns true if block is interactable with bare hand or non-special item.
+    // NOTE: This also block interaction with blocks of coal, iron, gold, diamond, emerald and netherite until Claims API can be used.
+    private static boolean isInteractable(final @Nullable Block block) {
+        if (block == null)
+            return false;
+        final Material material = block.getType();
+        // Returning 'true' if block is door, trapdoor or fence gate of any type.
+        if (Tag.DOORS.isTagged(material) == true || Tag.TRAPDOORS.isTagged(material) == true || Tag.FENCE_GATES.isTagged(material) == true)
+            return true;
+        // Returning 'true' if block is shulker box of any color.
+        if (Tag.SHULKER_BOXES.isTagged(material) == true)
+            return true;
+        // Returning 'true' if block is bed of any color.
+        if (Tag.BEDS.isTagged(material) == true)
+            return true;
+        // Returning 'true' if block is sign of any type.
+        if (Tag.ALL_SIGNS.isTagged(material) == true || Tag.ALL_HANGING_SIGNS.isTagged(material) == true)
+            return true;
+        // Returning 'true' if block is button of any type.
+        if (Tag.BUTTONS.isTagged(material) == true)
+            return true;
+        // Checking the rest of blocks individually, as they may not be tagged.
+        return switch (block.getType()) {
+            case CHEST, TRAPPED_CHEST, BARREL, ENDER_CHEST,
+                 // Bees
+                 BEEHIVE, BEE_NEST,
+                 // Furnaces
+                 FURNACE, BLAST_FURNACE, SMOKER,
+                 // Stations
+                 ANVIL, CHIPPED_ANVIL, DAMAGED_ANVIL,
+                 CRAFTING_TABLE, CRAFTER,
+                 CARTOGRAPHY_TABLE,
+                 ENCHANTING_TABLE,
+                 SMITHING_TABLE,
+                 BREWING_STAND,
+                 GRINDSTONE,
+                 LECTERN,
+                 BEACON,
+                 LOOM,
+                 // Pots
+                 DECORATED_POT, FLOWER_POT,
+                 // Music
+                 JUKEBOX, NOTE_BLOCK,
+                 // Redstone
+                 DISPENSER, DROPPER, HOPPER,
+                 LEVER, REPEATER,
+                 // Misc
+                 BELL, LODESTONE, RESPAWN_ANCHOR, VAULT, CHISELED_BOOKSHELF,
+                 // Claim Blocks (Hardcoded; To be replaced with Claims or WorldGuard API in the future)
+                 COAL_BLOCK, IRON_BLOCK, GOLD_BLOCK, DIAMOND_BLOCK, EMERALD_BLOCK, NETHERITE_BLOCK -> true;
+            // ...
+            default -> false;
+        };
     }
 
 }
