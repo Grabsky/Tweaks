@@ -155,6 +155,18 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("basket_settings.allowed_mobs")
     public static List<NamespacedKey> BASKET_SETTINGS_ALLOWED_MOBS;
 
+    @JsonNullable @JsonPath("basket_settings.pickup_sounds")
+    public static @Nullable List<Sound> BASKET_SETTINGS_PICKUP_SOUNDS;
+
+    @JsonNullable @JsonPath("basket_settings.pickup_particles")
+    public static @Nullable List<Particles> BASKET_SETTINGS_PICKUP_PARTICLES;
+
+    @JsonNullable @JsonPath("basket_settings.place_sounds")
+    public static @Nullable List<Sound> BASKET_SETTINGS_PLACE_SOUNDS;
+
+    @JsonNullable @JsonPath("basket_settings.place_particles")
+    public static @Nullable List<Particles> BASKET_SETTINGS_PLACE_PARTICLES;
+
     // Vaults Settings
 
     @JsonPath("vaults_settings.cooldowns")

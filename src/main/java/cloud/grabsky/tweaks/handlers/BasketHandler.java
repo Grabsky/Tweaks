@@ -98,9 +98,21 @@ public final class BasketHandler implements Module, Listener {
                             meta.getPersistentDataContainer().set(DATA_KEY, PersistentDataType.BYTE_ARRAY, data);
                         });
                         // Getting location of the entity. Might be used in a later step.
-                        final Location location = entity.getLocation();
+                        final Location location = entity.getLocation().add(0.0F, entity.getHeight() / 2.0F, 0.0F);
                         // Removing entity from the world.
                         entity.remove();
+                        // Spawning particles.
+                        if (PluginConfig.BASKET_SETTINGS_PICKUP_PARTICLES != null) {
+                            PluginConfig.BASKET_SETTINGS_PICKUP_PARTICLES.forEach(it -> {
+                                location.getWorld().spawnParticle(it.getParticle(), location.clone().add(0, entity.getHeight() / 2, 0), it.getAmount(), it.getOffsetX(), it.getOffsetY(), it.getOffsetZ(), it.getSpeed());
+                            });
+                        }
+                        // Playing sounds.
+                        if (PluginConfig.BASKET_SETTINGS_PICKUP_SOUNDS != null) {
+                            PluginConfig.BASKET_SETTINGS_PICKUP_SOUNDS.forEach(it -> {
+                                location.getWorld().playSound(it, location.x(), location.y(), location.z());
+                            });
+                        }
                         // Removing item from player's inventory.
                         if (event.getPlayer().getGameMode() == GameMode.SURVIVAL)
                             event.getPlayer().getInventory().getItemInMainHand().setAmount(event.getPlayer().getInventory().getItemInMainHand().getAmount() - 1);
@@ -109,7 +121,7 @@ public final class BasketHandler implements Module, Listener {
                             event.getPlayer().getInventory().setItemInMainHand(item);
                         else if (event.getPlayer().getInventory().firstEmpty() != -1)
                             event.getPlayer().getInventory().addItem(item);
-                        else location.getWorld().dropItemNaturally(location.add(0.0, 0.5, 0.0), item);
+                        else location.getWorld().dropItemNaturally(event.getPlayer().getLocation().add(0.0F, event.getPlayer().getHeight() / 2.0F, 0.0F), item);
                     }
                 }
             }
@@ -142,6 +154,18 @@ public final class BasketHandler implements Module, Listener {
                 );
                 // Spawning the entity.
                 entity.spawnAt(spawnLocation, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
+                // Spawning particles.
+                if (PluginConfig.BASKET_SETTINGS_PLACE_PARTICLES != null) {
+                    PluginConfig.BASKET_SETTINGS_PLACE_PARTICLES.forEach(it -> {
+                        spawnLocation.getWorld().spawnParticle(it.getParticle(), spawnLocation, it.getAmount(), it.getOffsetX(), it.getOffsetY(), it.getOffsetZ(), it.getSpeed());
+                    });
+                }
+                // Playing sounds.
+                if (PluginConfig.BASKET_SETTINGS_PLACE_SOUNDS != null) {
+                    PluginConfig.BASKET_SETTINGS_PLACE_SOUNDS.forEach(it -> {
+                        spawnLocation.getWorld().playSound(it, spawnLocation.x(), spawnLocation.y(), spawnLocation.z());
+                    });
+                }
             }
         }
     }
