@@ -291,6 +291,8 @@ public final class ScrollItem implements Module, Listener, PacketListener {
                  LEVER, REPEATER,
                  // Misc
                  BELL, LODESTONE, RESPAWN_ANCHOR, VAULT, CHISELED_BOOKSHELF,
+                 // Operator Blocks
+                 COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, REPEATING_COMMAND_BLOCK, STRUCTURE_BLOCK, JIGSAW,
                  // Claim Blocks (Hardcoded; To be replaced with Claims or WorldGuard API in the future)
                  COAL_BLOCK, IRON_BLOCK, GOLD_BLOCK, DIAMOND_BLOCK, EMERALD_BLOCK, NETHERITE_BLOCK -> true;
             // ...
