@@ -12,8 +12,6 @@ repositories {
     mavenCentral()
     // Repository containing the Paper API. (Forked; contains VaultStateChangeEvent)
     maven { url = "https://maven.pkg.github.com/0x46697265444F54/Fire"; fillCredentials(it) }
-    // Repository containing the Paper API and its dependencies.
-    maven { url = "https://repo.papermc.io/repository/maven-public/" }
     // Repository containing the 'PacketEvents' and 'Item-NBT-API' dependencies.
     maven { url = "https://repo.codemc.io/repository/maven-public" }
     // Repository containing the 'PlaceholderAPI' dependency.

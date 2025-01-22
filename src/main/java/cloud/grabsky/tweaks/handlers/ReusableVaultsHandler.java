@@ -34,7 +34,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.VaultDisplayItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -146,37 +145,6 @@ public final class ReusableVaultsHandler implements Module, Listener {
                     });
                 });
             }
-        }
-    }
-
-    // NOTE: Suggested alternative event here: https://github.com/PaperMC/Paper/discussions/11679
-    // Due to lack of proper API, VaultDisplayItemEvent must be used for the time being with no better workaround.
-    @EventHandler(ignoreCancelled = true)
-    public void onVaultDisplayItemEvent(final @NotNull VaultDisplayItemEvent event) {
-        if (true) return;
-        final org.bukkit.block.data.type.Vault blockData = (org.bukkit.block.data.type.Vault) event.getBlock().getBlockData();
-        final org.bukkit.block.Vault blockState = (Vault) event.getBlock().getState();
-        // Getting the loot-table of vault associated with the event.
-        final String lootTable = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.loot_table", "minecraft:chests/trial_chambers/reward"); });
-        // Getting the activation range of vault associated with the event.
-        final double activationRange = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.activation_range", 4.0); });
-        // Getting the cooldown for this vault.
-        final long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.getOrDefault(lootTable, Long.MAX_VALUE);
-        // Skipping vaults that have no cooldown configured.
-        if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
-            return;
-        // Getting the map of players that unlocked the vault.
-        final HashMap<UUID, Long> lastUnlock = blockState.getPersistentDataContainer().getOrDefault(VAULT_DATA_LAST_UNLOCK, HASH_MAP_UUID_TO_LONG, new HashMap<>());
-        // Iterating over the list of all players in range of vault and checking if all of them are on cooldown.
-        if (event.getBlock().getLocation().getNearbyPlayers(activationRange).stream().allMatch(it -> System.currentTimeMillis() - lastUnlock.getOrDefault(it.getUniqueId(), 0L) < cooldown * 1000) == true) {
-            // Cancelling the event.
-            event.setCancelled(true);
-            // Setting vault state to INACTIVE.
-            blockData.setVaultState(State.INACTIVE);
-            // Updating block data of this block state.
-            blockState.setBlockData(blockData);
-            // Updating the block state. Otherwise changes won't be applied.
-            blockState.update();
         }
     }
 
