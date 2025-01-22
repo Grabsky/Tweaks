@@ -30,6 +30,7 @@ import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -73,7 +74,7 @@ public final class ChairsHandler implements Module, Listener {
         HandlerList.unregisterAll(this);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onInteract(final @NotNull PlayerInteractEvent event) {
         // Skipping when player is already sitting in a vehicle. Need to test if both checks are needed.
         if (event.getPlayer().isInsideVehicle() == true || event.getPlayer().getVehicle() != null)
