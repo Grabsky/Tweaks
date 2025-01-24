@@ -44,6 +44,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,7 +90,11 @@ public final class ChairsHandler implements Module, Listener {
                 return;
             // Checking if block is any stairs.
             if (Tag.STAIRS.isTagged(block.getType()) == true && block.getBlockData() instanceof Stairs stairs && stairs.getHalf() == Bisected.Half.BOTTOM) {
+                // Returning if player is looking at the wrong face of the stairs.
                 if (event.getBlockFace() != BlockFace.UP && event.getBlockFace() != stairs.getFacing().getOppositeFace())
+                    return;
+                // Returning if there is a block above the stairs.
+                if (block.getRelative(BlockFace.UP).getType().isSolid() == true)
                     return;
                 // Cancelling the event...
                 event.setCancelled(true);
