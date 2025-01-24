@@ -35,6 +35,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
@@ -43,9 +45,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
-
-import java.util.Collections;
-import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -147,6 +146,28 @@ public final class ChairsHandler implements Module, Listener {
         event.getBlock().getWorld().getNearbyEntities(center, 0.1, 0.1, 0.1).forEach(it -> {
             if (it instanceof BlockDisplay display && display.getPersistentDataContainer().get(CHAIR_ENTITY, PersistentDataType.BYTE) != null && display.getPassengers().isEmpty() == false)
                 it.remove();
+        });
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPistonExtend(final @NotNull BlockPistonExtendEvent event) {
+        event.getBlocks().forEach(block -> {
+            final Location center = block.getLocation().toCenterLocation();
+            block.getWorld().getNearbyEntities(center, 0.1, 0.1, 0.1).forEach(it -> {
+                if (it instanceof BlockDisplay display && display.getPersistentDataContainer().get(CHAIR_ENTITY, PersistentDataType.BYTE) != null && display.getPassengers().isEmpty() == false)
+                    it.remove();
+            });
+        });
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPistonRetract(final @NotNull BlockPistonRetractEvent event) {
+        event.getBlocks().forEach(block -> {
+            final Location center = block.getLocation().toCenterLocation();
+            block.getWorld().getNearbyEntities(center, 0.1, 0.1, 0.1).forEach(it -> {
+                if (it instanceof BlockDisplay display && display.getPersistentDataContainer().get(CHAIR_ENTITY, PersistentDataType.BYTE) != null && display.getPassengers().isEmpty() == false)
+                    it.remove();
+            });
         });
     }
 
