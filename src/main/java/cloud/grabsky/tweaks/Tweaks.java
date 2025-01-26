@@ -41,6 +41,7 @@ import cloud.grabsky.tweaks.handlers.ImprovedEndPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
+import cloud.grabsky.tweaks.handlers.WitherSpawnWhitelistHandler;
 import cloud.grabsky.tweaks.items.EnderiteItem;
 import cloud.grabsky.tweaks.items.ScrollItem;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -109,6 +110,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new ReusableVaultsHandler(this),
                 new DamageMultipliersHandler(this),
                 new ImprovedEndPhantomsHandler(this),
+                new WitherSpawnWhitelistHandler(this),
                 // Items
                 new ScrollItem(this),
                 new EnderiteItem(this)

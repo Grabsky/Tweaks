@@ -26,6 +26,7 @@
         "reusable_vaults": false,
         "damage_multipliers": false,
         "improved_end_phantoms": false,
+        "wither_spawn_whitelist": false,
         // Items
         "scrolls": false,
         "enderite": false
@@ -166,5 +167,11 @@
                 "components": "[item_model=\"firedot:enderite/enderite_ingot\",item_name='{\"translate\":\"item.firedot.enderite_ingot\",\"fallback\":\"Enderite Ingot\"}']"
             }
         }
+    },
+    "wither_spawn_whitelist_settings": {
+        // List of worlds where wither can be summoned.
+        "enable_spawn_in_worlds": [
+            "minecraft:the_nether"
+        ]
     }
 }
