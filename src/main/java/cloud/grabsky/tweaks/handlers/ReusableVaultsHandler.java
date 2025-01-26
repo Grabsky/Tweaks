@@ -205,6 +205,11 @@ public final class ReusableVaultsHandler implements Module, Listener {
         }
 
         @Override
+        public boolean persist() {
+            return true;
+        }
+
+        @Override
         public @NotNull String getAuthor() {
             return "Grabsky";
         }
