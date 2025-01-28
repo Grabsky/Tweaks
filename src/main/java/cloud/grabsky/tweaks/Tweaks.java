@@ -28,6 +28,7 @@ import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
 import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.BasketHandler;
+import cloud.grabsky.tweaks.handlers.BreakingMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.CampfireHandler;
 import cloud.grabsky.tweaks.handlers.ChairsHandler;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
@@ -109,6 +110,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new SkullDataRecoveryHandler(this),
                 new ReusableVaultsHandler(this),
                 new DamageMultipliersHandler(this),
+                new BreakingMultipliersHandler(this),
                 new ImprovedEndPhantomsHandler(this),
                 new WitherSpawnWhitelistHandler(this),
                 // Items

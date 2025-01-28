@@ -21,6 +21,7 @@ import cloud.grabsky.tweaks.configuration.object.Particles;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -107,6 +108,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.damage_multipliers")
     public static boolean ENABLED_MODULES_DAMAGE_MULTIPLIERS;
 
+    @JsonPath("enabled_modules.breaking_multipliers")
+    public static boolean ENABLED_MODULES_BREAKING_MULTIPLIERS;
+
     @JsonPath("enabled_modules.improved_end_phantoms")
     public static boolean ENABLED_MODULES_IMPROVED_END_PHANTOMS;
 
@@ -152,6 +156,14 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("damage_multiplier_settings.incoming")
     public static Map<EntityType, Float>  DAMAGE_MULTIPLIER_SETTINGS_INCOMING;
+
+    // Breaking Multipliers Settings
+
+    @JsonPath("breaking_multiplier_settings.blocks")
+    public static Map<Material, Float> BREAKING_MULTIPLIER_SETTINGS_BLOCKS;
+
+    @JsonPath("breaking_multiplier_settings.check_loot_table")
+    public static boolean BREAKING_MULTIPLIER_SETTINGS_CHECK_LOOT_TABLE;
 
     // Basket Settings
 

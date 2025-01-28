@@ -25,6 +25,7 @@
         "skull_data_recovery": false,
         "reusable_vaults": false,
         "damage_multipliers": false,
+        "breaking_multipliers": false,
         "improved_end_phantoms": false,
         "wither_spawn_whitelist": false,
         // Items
@@ -119,6 +120,18 @@
         "incoming": {
             // "minecraft:chicken": 0.25
         }
+    },
+    "breaking_multiplier_settings": {
+        // Blocks that takes more (or less) time to break. The value is applied using the ADD_SCALAR_1 attribute operation.
+        "blocks": {
+            // "minecraft:barrel": -0.925,
+            // "minecraft:chest": -0.925,
+            // "minecraft:vault": -0.925,
+            // "minecraft:trial_spawner": -0.925,
+            // "minecraft:spawner": -0.925
+        },
+        // Whether to check if containers should have a loot-table set.
+        "check_loot_table": false
     },
     "teleportation_settings": {
         // Delay before player is teleported. (in seconds)
