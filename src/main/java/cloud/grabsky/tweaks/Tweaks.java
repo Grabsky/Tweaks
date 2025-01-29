@@ -35,6 +35,7 @@ import cloud.grabsky.tweaks.handlers.ClockHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
 import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
 import cloud.grabsky.tweaks.handlers.DamageMultipliersHandler;
+import cloud.grabsky.tweaks.handlers.DimensionSoftLockHandler;
 import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
@@ -113,6 +114,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new BreakingMultipliersHandler(this),
                 new ImprovedEndPhantomsHandler(this),
                 new WitherSpawnWhitelistHandler(this),
+                new DimensionSoftLockHandler(this),
                 // Items
                 new ScrollItem(this),
                 new EnderiteItem(this)

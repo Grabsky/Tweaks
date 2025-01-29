@@ -117,6 +117,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.wither_spawn_whitelist")
     public static boolean ENABLED_MODULES_WITHER_SPAWN_WHITELIST;
 
+    @JsonPath("enabled_modules.dimension_soft_lock")
+    public static boolean ENABLED_MODULES_DIMENSION_SOFT_LOCK;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.scrolls")
@@ -235,6 +238,17 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("wither_spawn_whitelist_settings.enable_spawn_in_worlds")
     public static List<NamespacedKey> WITHER_SPAWN_WHITELIST_SETTINGS_ENABLE_SPAWN_IN_WORLDS;
+
+    // Dimension Soft Lock Settings
+
+    @JsonPath("dimension_soft_lock_settings.dimensions")
+    public static Map<NamespacedKey, Long> DIMENSION_SOFT_LOCK_SETTINGS_DIMENSIONS;
+
+    @JsonPath("dimension_soft_lock_settings.error_messages")
+    public static Map<NamespacedKey, String> DIMENSION_SOFT_LOCK_SETTINGS_ERROR_MESSAGES;
+
+    @JsonPath("dimension_soft_lock_settings.error_sounds")
+    public static Map<NamespacedKey, Sound> DIMENSION_SOFT_LOCK_SETTINGS_ERROR_SOUNDS;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.

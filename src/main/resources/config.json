@@ -28,6 +28,7 @@
         "breaking_multipliers": false,
         "improved_end_phantoms": false,
         "wither_spawn_whitelist": false,
+        "dimension_soft_lock": false,
         // Items
         "scrolls": false,
         "enderite": false
@@ -186,5 +187,22 @@
         "enable_spawn_in_worlds": [
             "minecraft:the_nether"
         ]
+    },
+    "dimension_soft_lock_settings": {
+        // List of dimensions and time required for player to be able to enter them. In seconds.
+        "dimensions": {
+            "minecraft:the_nether": 36000,
+            "minecraft:the_end": 90000
+        },
+        // Error messages to be sent to the player.
+        "error_messages": {
+            "minecraft:the_nether": "<newline><dark_gray>› <red>Nie spełniasz wymagań, aby wejść do tego wymiaru.<newline><dark_gray>› <gray>Graj jeszcze przez <red><time_left><gray>, aby go odblokować.<newline>",
+            "minecraft:the_end":  "<newline><dark_gray>› <red>Nie spełniasz wymagań, aby wejść do tego wymiaru.<newline><dark_gray>› <gray>Graj jeszcze przez <red><time_left><gray>, aby go odblokować.<newline>"
+        },
+        // Error sounds to be played for the player.
+        "error_sounds": {
+            "minecraft:the_nether": { "key": "minecraft:item.ominous_bottle.dispose", "source": "player", "volume": 1.0, "pitch": 0.85 },
+            "minecraft:the_end": { "key": "minecraft:item.ominous_bottle.dispose", "source": "player", "volume": 1.0, "pitch": 0.85 }
+        }
     }
 }
