@@ -18,7 +18,6 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -65,12 +64,12 @@ public final class BalancedKeepInventoryHandler implements Module, Listener {
             Stream.concat(
                     Stream.of(inventory.getArmorContents()),
                     HOTBAR_SLOTS.stream().map(inventory::getItem)
-            ).filter(item -> item != null && item.isEmpty() == false).forEach(item -> {
+            ).filter(item -> item != null && item.isEmpty() == false && item.isEnchantedWith("minecraft:vanishing_curse") == false).forEach(item -> {
                 event.getItemsToKeep().add(item);
                 event.getDrops().remove(item);
             });
             // Keeping off-hand slot throughout deaths.
-            if (inventory.getItemInOffHand().getType() != Material.AIR) {
+            if (inventory.getItemInOffHand().isEmpty() == false && inventory.getItemInOffHand().isEnchantedWith("minecraft:vanishing_curse") == false) {
                 event.getItemsToKeep().add(inventory.getItemInOffHand());
                 event.getDrops().remove(inventory.getItemInOffHand());
             }
