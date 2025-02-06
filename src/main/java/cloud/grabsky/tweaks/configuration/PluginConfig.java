@@ -120,6 +120,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.dimension_soft_lock")
     public static boolean ENABLED_MODULES_DIMENSION_SOFT_LOCK;
 
+    @JsonPath("enabled_modules.balanced_villager_restock")
+    public static boolean ENABLED_MODULES_BALANCED_VILLAGER_RESTOCK;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.scrolls")

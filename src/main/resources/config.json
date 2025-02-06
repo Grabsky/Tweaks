@@ -29,6 +29,7 @@
         "improved_end_phantoms": false,
         "wither_spawn_whitelist": false,
         "dimension_soft_lock": false,
+        "balanced_villager_restock": false,
         // Items
         "scrolls": false,
         "enderite": false
