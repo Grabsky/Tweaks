@@ -22,6 +22,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -76,7 +77,7 @@ public final class ClockHandler implements Module, Listener {
                 final BossBar bar = storage.computeIfAbsent(player.getUniqueId(), (_) -> {
                     return BossBar.bossBar(Component.empty(), 0.0F, PluginConfig.CLOCK_SETTINGS_BOSSBAR.getColor(), PluginConfig.CLOCK_SETTINGS_BOSSBAR.getOverlay());
                 });
-                if (player.getInventory().getItemInMainHand().getType() == Material.CLOCK || player.getInventory().getItemInOffHand().getType() == Material.CLOCK) {
+                if (player.getInventory().getItemInMainHand().getType() == Material.CLOCK || player.getInventory().getItemInOffHand().getType() == Material.CLOCK || (player.getTargetEntity(5) instanceof ItemFrame frame && frame.getItem().getType() == Material.CLOCK) == true) {
                     final Component text = Component.text(PluginConfig.CLOCK_SETTINGS_BOSSBAR.getText().replace("<time>", WorldTimeFormatter.getFormattedTime(player.getWorld().getTime())));
                     // Updating the name in case different.
                     if (bar.name().equals(text) == false)
