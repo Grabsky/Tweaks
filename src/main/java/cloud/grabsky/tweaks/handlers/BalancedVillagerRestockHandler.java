@@ -49,8 +49,6 @@ public final class BalancedVillagerRestockHandler implements Module, Listener {
     @EventHandler(ignoreCancelled = true)
     public void onVillagerTradeReplenish(final @NotNull VillagerReplenishTradeEvent event) {
         if (event.getRecipe().getResult().getType() == Material.DIAMOND_HOE) {
-            // Cancelling the event.
-            event.setCancelled(true);
             // Adjusting the uses and max uses of the recipe.
             event.getRecipe().setUses(0);
             event.getRecipe().setMaxUses(1);
