@@ -122,6 +122,8 @@ public final class BasketHandler implements Module, Listener {
                         else if (event.getPlayer().getInventory().firstEmpty() != -1)
                             event.getPlayer().getInventory().addItem(item);
                         else location.getWorld().dropItemNaturally(event.getPlayer().getLocation().add(0.0F, event.getPlayer().getHeight() / 2.0F, 0.0F), item);
+                        // Applying 500ms cooldown to prevent accidental use.
+                        event.getPlayer().setCooldown(item, 10);
                     }
                 }
             }
