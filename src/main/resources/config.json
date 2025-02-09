@@ -10,8 +10,6 @@
         "enhanced_map": false,
         // Chairs
         "chairs": false,
-        // Basket
-        "basket": false,
         // Inventory Rules
         "balanced_keep_inventory": false,
         "invulnerable_players_keep_inventory": false,
@@ -31,6 +29,7 @@
         "dimension_soft_lock": false,
         "balanced_villager_restock": false,
         // Items
+        "basket": false,
         "scrolls": false,
         "enderite": false
     },

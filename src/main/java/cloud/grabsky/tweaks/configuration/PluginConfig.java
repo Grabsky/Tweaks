@@ -66,11 +66,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.chairs")
     public static boolean ENABLED_MODULES_CHAIRS;
 
-    // Enabled Modules > Basket
-
-    @JsonPath("enabled_modules.basket")
-    public static boolean ENABLED_MODULES_BASKET;
-
     // Enabled Modules > Inventory Rules
 
     @JsonPath("enabled_modules.balanced_keep_inventory")
@@ -124,6 +119,9 @@ public final class PluginConfig implements JsonConfiguration {
     public static boolean ENABLED_MODULES_BALANCED_VILLAGER_RESTOCK;
 
     // Enabled Modules > Items
+
+    @JsonPath("enabled_modules.basket")
+    public static boolean ENABLED_MODULES_BASKET;
 
     @JsonPath("enabled_modules.scrolls")
     public static boolean ENABLED_MODULES_SCROLLS;

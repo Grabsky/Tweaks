@@ -28,7 +28,7 @@ import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
 import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.BalancedVillagerRestockHandler;
-import cloud.grabsky.tweaks.handlers.BasketHandler;
+import cloud.grabsky.tweaks.items.BasketHandler;
 import cloud.grabsky.tweaks.handlers.BreakingMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.CampfireHandler;
 import cloud.grabsky.tweaks.handlers.ChairsHandler;
