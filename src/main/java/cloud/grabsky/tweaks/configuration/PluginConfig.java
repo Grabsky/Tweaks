@@ -50,6 +50,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.bait_enchantment")
     public static boolean ENABLED_MODULES_BAIT_ENCHANTMENT;
 
+    @JsonPath("enabled_modules.stride_enchantment")
+    public static boolean ENABLED_MODULES_STRIDE_ENCHANTMENT;
+
     // Enabled Modules > Enhanced Items
 
     @JsonPath("enabled_modules.enhanced_clock")

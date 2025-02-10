@@ -71,8 +71,6 @@ public final class BaitEnchantment implements Module, Listener {
                 }
             }
         }
-
     }
-
 
 }

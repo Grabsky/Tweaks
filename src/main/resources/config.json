@@ -4,6 +4,7 @@
         "sonic_shield_enchantment": false,
         "magnet_enchantment": false,
         "bait_enchantment": false,
+        "stride_enchantment": false,
         // Enhanced Items
         "enhanced_clock": false,
         "enhanced_compass": false,
