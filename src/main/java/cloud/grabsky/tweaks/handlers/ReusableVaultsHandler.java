@@ -28,6 +28,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.TrialSpawner;
 import org.bukkit.block.Vault;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -197,7 +198,12 @@ public final class ReusableVaultsHandler implements Module, Listener {
 
         // Responsible for storing 'vault_cooldown' placeholders. These must be stored in some way or another because retrieving them is an immediate operation.
         // NOTE: In case ConcurrentModificationException or similar issues happen, this can probably be changed to a ConcurrentMap instead.
-        private final Map<String, String> cache = new HashMap<>();
+        private final Map<String, String> vaultsCache = new HashMap<>();
+
+        // Responsible for storing 'vault_cooldown' placeholders. These must be stored in some way or another because retrieving them is an immediate operation.
+        // NOTE: In case ConcurrentModificationException or similar issues happen, this can probably be changed to a ConcurrentMap instead.
+        private final Map<String, String> spawnersCache = new HashMap<>();
+
 
         @Override
         public @NotNull String getIdentifier() {
@@ -221,7 +227,41 @@ public final class ReusableVaultsHandler implements Module, Listener {
 
         @Override
         public @Nullable String onRequest(final @NotNull OfflinePlayer offlinePlayer, final @NotNull String params) {
-            if (params.startsWith("vault_cooldown_") == true && offlinePlayer instanceof Player player && player.isOnline() == true) {
+            // Placeholder: %tweaks_trial_spawner_cooldown_[X];[Y];[Z];[WORLD]%
+            if (params.startsWith("trial_spawner_cooldown_") == true && offlinePlayer instanceof Player player && player.isOnline() == true) {
+                // Getting the location part of the param.
+                final String[] part = params.replace("trial_spawner_cooldown_", "").split(";");
+                // Making sure it's of the correct length.
+                if (part.length == 4) {
+                    // Parsing location part to actual values.
+                    final @Nullable Double x = parseDouble(part[0]);
+                    final @Nullable Double y = parseDouble(part[1]);
+                    final @Nullable Double z = parseDouble(part[2]);
+                    final @Nullable World world = Bukkit.getWorlds().stream().filter(it -> it.getName().equals(part[3])).findFirst().orElse(null);
+                    // Checking if all values exist.
+                    if (x != null && y != null && z != null && world != null) {
+                        // Creating Location instance from provided values.
+                        final Location location = new Location(world, x, y, z);
+                        // Checking if chunk is loaded and if block at the requested location is a vault.
+                        if (location.isChunkLoaded() == false || location.getBlock().getType() != Material.TRIAL_SPAWNER)
+                            return "N/A";
+                        // Scheduling stuff that needs to be done on the main thread.
+                        plugin.getBedrockScheduler().run(1L, (_) -> {
+                            final org.bukkit.block.TrialSpawner blockState = (TrialSpawner) location.getBlock().getState();
+                            // Getting the timestamp at which cooldown is ending at.
+                            final long cooldownEndsAt = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("cooldown_ends_at", (long) 0); });
+                            // Calculating the time that is left on the spawner.
+                            final Interval difference = Interval.between(cooldownEndsAt, location.getWorld().getGameTime(), Unit.TICKS);
+                            // Updating the cached placeholder.
+                            spawnersCache.put(player.getUniqueId() + "/" + params, (difference.as(Unit.MILLISECONDS) > 0) ? difference.toString() : "");
+                        });
+                    }
+                }
+                // Returning the value from cache.
+                return spawnersCache.getOrDefault(player.getUniqueId() + "/" + params, "");
+            }
+            // Placeholder: %tweaks_vault_cooldown_[X];[Y];[Z];[WORLD]%
+            else if (params.startsWith("vault_cooldown_") == true && offlinePlayer instanceof Player player && player.isOnline() == true) {
                 // Getting the location part of the param.
                 final String[] part = params.replace("vault_cooldown_", "").split(";");
                 // Making sure it's of the correct length.
@@ -255,13 +295,13 @@ public final class ReusableVaultsHandler implements Module, Listener {
                                 // Calculating the cooldown that is left on the vault.
                                 final Interval difference = Interval.between(lastUnlock.getOrDefault(player.getUniqueId(), 0L) + cooldown, System.currentTimeMillis(), Unit.MILLISECONDS);
                                 // Updating the cached placeholder.
-                                cache.put(player.getUniqueId() + "/" + params, (difference.as(Unit.MILLISECONDS) > 0) ? difference.toString() : "");
+                                vaultsCache.put(player.getUniqueId() + "/" + params, (difference.as(Unit.MILLISECONDS) > 0) ? difference.toString() : "");
                             });
                         });
                     }
                 }
                 // Returning the value from cache.
-                return cache.getOrDefault(player.getUniqueId() + "/" + params, "");
+                return vaultsCache.getOrDefault(player.getUniqueId() + "/" + params, "");
             }
             return null;
         }
