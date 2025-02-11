@@ -29,6 +29,7 @@ import cloud.grabsky.tweaks.enchantments.StrideEnchantment;
 import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
 import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.BalancedVillagerRestockHandler;
+import cloud.grabsky.tweaks.handlers.ColoredNametagsHandler;
 import cloud.grabsky.tweaks.items.BasketHandler;
 import cloud.grabsky.tweaks.handlers.BreakingMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.CampfireHandler;
@@ -119,6 +120,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new WitherSpawnWhitelistHandler(this),
                 new DimensionSoftLockHandler(this),
                 new BalancedVillagerRestockHandler(this),
+                new ColoredNametagsHandler(this),
                 // Items
                 new ScrollItem(this),
                 new EnderiteItem(this)

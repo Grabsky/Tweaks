@@ -29,6 +29,7 @@
         "wither_spawn_whitelist": false,
         "dimension_soft_lock": false,
         "balanced_villager_restock": false,
+        "colored_nametags": false,
         // Items
         "basket": false,
         "scrolls": false,
@@ -204,6 +205,26 @@
         "error_sounds": {
             "minecraft:the_nether": { "key": "minecraft:item.ominous_bottle.dispose", "source": "player", "volume": 1.0, "pitch": 0.85 },
             "minecraft:the_end": { "key": "minecraft:item.ominous_bottle.dispose", "source": "player", "volume": 1.0, "pitch": 0.85 }
+        }
+    },
+    "colored_nametags_settings": {
+        "colors": {
+            "minecraft:white_dye": "#FFFFFF",
+            "minecraft:orange_dye": "#FF8C00",
+            "minecraft:magenta_dye": "#FF00FF",
+            "minecraft:light_blue_dye": "#66CCFF",
+            "minecraft:yellow_dye": "#FFD700",
+            "minecraft:lime_dye": "#32CD32",
+            "minecraft:pink_dye": "#FF69B4",
+            "minecraft:gray_dye": "#808080",
+            "minecraft:light_gray_dye": "#D3D3D3",
+            "minecraft:cyan_dye": "#008B8B",
+            "minecraft:purple_dye": "#800080",
+            "minecraft:blue_dye": "#4169E1",
+            "minecraft:brown_dye": "#8B4513",
+            "minecraft:green_dye": "#228B22",
+            "minecraft:red_dye": "#DB1417",
+            "minecraft:black_dye": "#1E1E1E"
         }
     }
 }

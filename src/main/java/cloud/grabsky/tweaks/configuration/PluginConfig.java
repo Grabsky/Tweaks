@@ -121,6 +121,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.balanced_villager_restock")
     public static boolean ENABLED_MODULES_BALANCED_VILLAGER_RESTOCK;
 
+    @JsonPath("enabled_modules.colored_nametags")
+    public static boolean ENABLED_MODULES_COLORED_NAMETAGS;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.basket")
@@ -253,6 +256,11 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("dimension_soft_lock_settings.error_sounds")
     public static Map<NamespacedKey, Sound> DIMENSION_SOFT_LOCK_SETTINGS_ERROR_SOUNDS;
+
+    // Colored Nametags Settings
+
+    @JsonPath("colored_nametags_settings.colors")
+    public static Map<Material, String> COLORED_NAMETAGS_SETTINGS_COLORS;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.
