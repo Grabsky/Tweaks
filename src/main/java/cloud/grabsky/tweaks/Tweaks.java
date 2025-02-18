@@ -50,7 +50,6 @@ import cloud.grabsky.tweaks.handlers.WitherSpawnWhitelistHandler;
 import cloud.grabsky.tweaks.items.EnderiteItem;
 import cloud.grabsky.tweaks.items.ScrollItem;
 import com.github.retrooper.packetevents.PacketEvents;
-import de.tr7zw.changeme.nbtapi.NBT;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -128,11 +127,6 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)
             this.getServer().shutdown();
-        // Preloading Item NBT API and shutting the server down in case of a failure.
-        if (NBT.preloadApi() == false) {
-            this.getLogger().severe("An error occurred while initializing NBT-API. Shutting down the server.");
-            this.getServer().shutdown();
-        }
         // Initializing PacketEvents.
         PacketEvents.getAPI().init();
         // Creating RootCommandManager instance.

@@ -20,7 +20,6 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import com.jeff_media.morepersistentdatatypes.DataType;
-import de.tr7zw.changeme.nbtapi.NBT;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -40,7 +39,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import pl.firedot.paper.event.VaultStateChangeEvent;
+import org.purpurmc.purpur.event.VaultStateChangeEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,10 +99,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
             if (blockData.getVaultState() == State.UNLOCKING || blockData.getVaultState() == State.EJECTING)
                 return;
             // Getting the key required to unlock this vault.
-            final @Nullable ItemStack key = NBT.get(blockState, (nbt) -> (nbt.hasTag("config") == true) ? nbt.getCompound("config").getItemStack("key_item") : null);
-            // Returning if key is not set. This is unlikely to ever happen but is technically possible.
-            if (key == null)
-                return;
+            final @Nullable ItemStack key = blockState.getKeyItem();
             // Checking if player has key in their hands.
             if (event.getItem() != null && event.getItem().isSimilar(key) == true) {
                 // Skipping off-hand if player already has a key in their main hand.
@@ -112,7 +108,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
                 // Getting unique id of the player.
                 final UUID uniqueId = event.getPlayer().getUniqueId();
                 // Getting vault config values.
-                final String lootTable = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.loot_table", "minecraft:chests/trial_chambers/reward"); });
+                final String lootTable = blockState.getLootTable().getKey().asString();
                 // Skipping vaults that have no cooldown configured.
                 if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
                     return;
@@ -141,9 +137,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
                         updatedBlockState.update();
                     }
                     // Clearing list of rewarded players as we're applying our own cooldown logic.
-                    NBT.modify(updatedBlockState, (nbt) -> {
-                        nbt.getOrCreateCompound("server_data").removeKey("rewarded_players");
-                    });
+                    blockState.getRewardedPlayers().forEach(blockState::removeRewardedPlayer);
                 });
             }
         }
@@ -154,13 +148,9 @@ public final class ReusableVaultsHandler implements Module, Listener {
         if (event.getNewState() == State.ACTIVE) {
             final org.bukkit.block.Vault blockState = (Vault) event.getBlock().getState();
             // Getting the loot-table of vault associated with the event.
-            final String lootTable = NBT.get(blockState, (nbt) -> {
-                return nbt.resolveOrDefault("config.loot_table", "minecraft:chests/trial_chambers/reward");
-            });
+            final String lootTable = blockState.getLootTable().getKey().asString();
             // Getting the activation range of vault associated with the event.
-            final double activationRange = NBT.get(blockState, (nbt) -> {
-                return nbt.resolveOrDefault("config.activation_range", 4.0);
-            });
+            final double activationRange = blockState.getActivationRange();
             // Getting the cooldown for this vault.
             final long cooldown = PluginConfig.VAULTS_SETTINGS_COOLDOWNS.getOrDefault(lootTable, Long.MAX_VALUE);
             // Skipping vaults that have no cooldown configured.
@@ -249,7 +239,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
                         plugin.getBedrockScheduler().run(1L, (_) -> {
                             final org.bukkit.block.TrialSpawner blockState = (TrialSpawner) location.getBlock().getState();
                             // Getting the timestamp at which cooldown is ending at.
-                            final long cooldownEndsAt = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("cooldown_ends_at", (long) 0); });
+                            final long cooldownEndsAt = blockState.getCooldownEnd();
                             // Calculating the time that is left on the spawner.
                             final Interval difference = Interval.between(cooldownEndsAt, location.getWorld().getGameTime(), Unit.TICKS);
                             // Updating the cached placeholder.
@@ -282,7 +272,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
                         plugin.getBedrockScheduler().run(1L, (_) -> {
                             final org.bukkit.block.Vault blockState = (Vault) location.getBlock().getState();
                             // Getting the loot-table of vault associated with the event.
-                            final String lootTable = NBT.get(blockState, (nbt) -> { return nbt.resolveOrDefault("config.loot_table", "minecraft:chests/trial_chambers/reward"); });
+                            final String lootTable = blockState.getLootTable().getKey().asString();
                             // Skipping vaults that have no cooldown configured. This could be scheduled in the task below but returning early ensures no thread is created for no reason.
                             if (PluginConfig.VAULTS_SETTINGS_COOLDOWNS.containsKey(lootTable) == false)
                                 return;
