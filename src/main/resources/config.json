@@ -105,7 +105,52 @@
             "minecraft:wolf",
             "minecraft:zombie_horse",
             "minecraft:zombie_villager"
-        ]
+        ],
+        // Whether enchantment glint should applied to the item.
+        "apply_enchantment_glint": true,
+        // Whether additional lore should be applied to the item.
+        "apply_additional_lore": true,
+        // Additional lore formats.
+        "additional_lore_format": {
+            "minecraft:axolotl": [
+                "<gray><lang:basket.axolotl_variant>: <variant>"
+            ],
+            "minecraft:horse": [
+                "<gray><lang:basket.horse_style>: <style>",
+                "<gray><lang:basket.horse_color>: <color>"
+            ],
+            "minecraft:llama": [
+                "<gray><lang:basket.llama_color>: <color>"
+            ],
+            "minecraft:parrot": [
+                "<gray><lang:basket.parrot_variant>: <variant>"
+            ],
+            "minecraft:rabbit": [
+                "<gray><lang:basket.rabbit_type>: <type>"
+            ],
+            "minecraft:villager": [
+                "<gray><lang:basket.villager_type>: <type>",
+                "<gray><lang:basket.villager_profession>: <profession>"
+            ],
+            "minecraft:cat": [
+                "<gray><lang:basket.cat_type>: <type>"
+            ],
+            "minecraft:fox": [
+                "<gray><lang:basket.fox_type>: <type>"
+            ],
+            "minecraft:panda": [
+                "<gray><lang:basket.panda_gene>: <gene>"
+            ],
+            "minecraft:frog": [
+                "<gray><lang:basket.frog_variant>: <variant>"
+            ],
+            "minecraft:sheep": [
+                "<gray><lang:basket.sheep_color>: <color>"
+            ],
+            "minecraft:wolf": [
+                "<gray><lang:basket.wolf_variant>: <variant>"
+            ]
+        }
     },
     "vaults_settings": {
         // Cooldown to be applied on vault unlock. Vaults are identified by their loot-table key. In seconds.

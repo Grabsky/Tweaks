@@ -14,11 +14,15 @@
  */
 package cloud.grabsky.tweaks.items;
 
+import cloud.grabsky.bedrock.components.ComponentBuilder;
+import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,8 +30,20 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Crafter;
+import org.bukkit.entity.Axolotl;
+import org.bukkit.entity.Cat;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fox;
+import org.bukkit.entity.Frog;
+import org.bukkit.entity.Horse;
+import org.bukkit.entity.Llama;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Panda;
+import org.bukkit.entity.Parrot;
+import org.bukkit.entity.Rabbit;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -42,6 +58,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,8 +113,20 @@ public final class BasketHandler implements Module, Listener {
                         final ItemStack item = ItemStack.of(Registry.MATERIAL.get(itemKey), 1);
                         // Modifying item.
                         item.editMeta(meta -> {
-                            meta.setEnchantmentGlintOverride(true);
+                            // Baskets should have maximum stack size of 1.
+                            meta.setMaxStackSize(1);
+                            // Applying entity data to the PDC.
                             meta.getPersistentDataContainer().set(DATA_KEY, PersistentDataType.BYTE_ARRAY, data);
+                            // Applying enchantment glint if specified.
+                            if (PluginConfig.BASKET_SETTINGS_APPLY_ENCHANTMENT_GLINT)
+                                meta.setEnchantmentGlintOverride(true);
+                            // Applying additional lore if specified.
+                            if (PluginConfig.BASKET_SETTINGS_APPLY_ADDITIONAL_LORE) {
+                                final @Nullable List<String> additionalLore = getAdditionalLore(entity);
+                                // If available, applying additional information to the item lore.
+                                if (additionalLore != null && additionalLore.isEmpty() == false)
+                                    meta.lore(additionalLore.stream().map(str -> ComponentBuilder.EMPTY_NO_ITALIC.append(MiniMessage.miniMessage().deserialize(str))).toList());
+                            }
                         });
                         // Getting location of the entity. Might be used in a later step.
                         final Location location = entity.getLocation().add(0.0F, entity.getHeight() / 2.0F, 0.0F);
@@ -205,4 +236,70 @@ public final class BasketHandler implements Module, Listener {
         }
     }
 
+
+    /* HELPER METHODS */
+
+    // NOTE: 1.21.5 brings a lot of new mob variants that need special care.
+    private static @Nullable List<String> getAdditionalLore(final @NotNull Mob mob) {
+        final NamespacedKey entity = mob.getType().getKey();
+        final @Nullable List<String> additionalLoreFormat = PluginConfig.BASKET_SETTINGS_ADDITIONAL_LORE_FORMAT.getOrDefault(entity, Collections.emptyList());
+        // Returning if no additional lore format was specified for this entity.
+        if (additionalLoreFormat == null || additionalLoreFormat.isEmpty() == true)
+            return null;
+        // Replacing placeholders with actual values. Switch must be used because variations are currently not standardized.
+        return switch (mob) {
+            // AXOLOTL
+            case Axolotl axolotl -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.axolotl_variant." + axolotl.getVariant().name().toLowerCase() + ">"))
+                    .toList();
+            // HORSE
+            case Horse horse -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<style>", "<lang:basket.horse_style." + horse.getStyle().name().toLowerCase() + ">"))
+                    .map(format -> format.replace("<color>", "<lang:basket.horse_color." + horse.getColor().name().toLowerCase() + ">"))
+                    .toList();
+            // LLAMA
+            case Llama llama -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<color>", "<lang:basket.llama_color." + llama.getColor().name().toLowerCase() + ">"))
+                    .toList();
+            // PARROT
+            case Parrot parrot -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.parrot_variant." + parrot.getVariant().name().toLowerCase() + ">"))
+                    .toList();
+            // RABBIT
+            case Rabbit rabbit -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<type>", "<lang:basket.rabbit_type." + rabbit.getRabbitType().name().toLowerCase() + ">"))
+                    .toList();
+            // VILLAGER
+            case Villager villager -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<type>", "<lang:basket.villager_type." + villager.getVillagerType().getKey().getKey() + ">"))
+                    .map(format -> format.replace("<profession>", "<lang:basket.villager_profession." + villager.getProfession().getKey().getKey() + ">"))
+                    .toList();
+            // CAT
+            case Cat cat -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<type>", "<lang:basket.cat_type." + cat.getCatType().getKey().getKey() + ">"))
+                    .toList();
+            // FOX
+            case Fox fox -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<type>", "<lang:basket.fox_type." + fox.getFoxType().name().toLowerCase() + ">"))
+                    .toList();
+            // PANDA
+            case Panda panda -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<gene>", "<lang:basket.panda_gene." + panda.getMainGene().name().toLowerCase() + ">"))
+                    .toList();
+            // FROG
+            case Frog frog -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.frog_variant." + frog.getVariant().getKey().getKey() + ">"))
+                    .toList();
+            // SHEEP
+            case Sheep sheep -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<color>", "<lang:basket.sheep_color." + Conditions.requirePresent(sheep.getColor(), DyeColor.WHITE).name().toLowerCase() + ">"))
+                    .toList();
+            // WOLF
+            case Wolf wolf -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.wolf_variant." + wolf.getVariant().getKey().getKey() + ">"))
+                    .toList();
+            // NO VARIANTS
+            default -> null;
+        };
+    }
 }

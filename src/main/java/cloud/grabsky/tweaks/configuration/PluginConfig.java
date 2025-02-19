@@ -192,6 +192,15 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonNullable @JsonPath("basket_settings.place_particles")
     public static @Nullable List<Particles> BASKET_SETTINGS_PLACE_PARTICLES;
 
+    @JsonPath("basket_settings.apply_enchantment_glint")
+    public static boolean BASKET_SETTINGS_APPLY_ENCHANTMENT_GLINT;
+
+    @JsonPath("basket_settings.apply_additional_lore")
+    public static boolean BASKET_SETTINGS_APPLY_ADDITIONAL_LORE;
+
+    @JsonPath("basket_settings.additional_lore_format")
+    public static Map<NamespacedKey, List<String>> BASKET_SETTINGS_ADDITIONAL_LORE_FORMAT;
+
     // Vaults Settings
 
     @JsonPath("vaults_settings.cooldowns")
