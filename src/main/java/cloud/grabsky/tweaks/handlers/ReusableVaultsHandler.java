@@ -137,7 +137,9 @@ public final class ReusableVaultsHandler implements Module, Listener {
                         updatedBlockState.update();
                     }
                     // Clearing list of rewarded players as we're applying our own cooldown logic.
-                    blockState.getRewardedPlayers().forEach(blockState::removeRewardedPlayer);
+                    updatedBlockState.getRewardedPlayers().forEach(updatedBlockState::removeRewardedPlayer);
+                    // Updating the block state. Otherwise changes won't be applied.
+                    updatedBlockState.update();
                 });
             }
         }
