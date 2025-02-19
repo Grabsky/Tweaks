@@ -34,11 +34,8 @@ import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientIn
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -167,7 +164,7 @@ public final class ScrollItem implements Module, Listener, PacketListener {
         if (event.getPlayer().getTargetEntity((int) event.getPlayer().getAttribute(Attribute.ENTITY_INTERACTION_RANGE).getValue()) != null)
             return;
         // Returning if clicked block is interactable.
-        if (event.getClickedBlock() != null && isInteractable(event.getClickedBlock()) == true)
+        if (event.getClickedBlock() != null && event.getClickedBlock().isInteractable() == true)
             return;
         // Returning if clicked entity is not null.
         if (event.getHand() == EquipmentSlot.HAND && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) && event.getItem() != null) {
@@ -241,63 +238,6 @@ public final class ScrollItem implements Module, Listener, PacketListener {
                         .sendActionBar(player);
             }
         }
-    }
-
-    // Returns true if block is interactable with bare hand or non-special item.
-    // NOTE: This also block interaction with blocks of coal, iron, gold, diamond, emerald and netherite until Claims API can be used.
-    private static boolean isInteractable(final @Nullable Block block) {
-        if (block == null)
-            return false;
-        final Material material = block.getType();
-        // Returning 'true' if block is door, trapdoor or fence gate of any type.
-        if (Tag.DOORS.isTagged(material) == true || Tag.TRAPDOORS.isTagged(material) == true || Tag.FENCE_GATES.isTagged(material) == true)
-            return true;
-        // Returning 'true' if block is shulker box of any color.
-        if (Tag.SHULKER_BOXES.isTagged(material) == true)
-            return true;
-        // Returning 'true' if block is bed of any color.
-        if (Tag.BEDS.isTagged(material) == true)
-            return true;
-        // Returning 'true' if block is sign of any type.
-        if (Tag.ALL_SIGNS.isTagged(material) == true || Tag.ALL_HANGING_SIGNS.isTagged(material) == true)
-            return true;
-        // Returning 'true' if block is button of any type.
-        if (Tag.BUTTONS.isTagged(material) == true)
-            return true;
-        // Checking the rest of blocks individually, as they may not be tagged.
-        return switch (block.getType()) {
-            case CHEST, TRAPPED_CHEST, BARREL, ENDER_CHEST,
-                 // Bees
-                 BEEHIVE, BEE_NEST,
-                 // Furnaces
-                 FURNACE, BLAST_FURNACE, SMOKER,
-                 // Stations
-                 ANVIL, CHIPPED_ANVIL, DAMAGED_ANVIL,
-                 CRAFTING_TABLE, CRAFTER,
-                 CARTOGRAPHY_TABLE,
-                 ENCHANTING_TABLE,
-                 SMITHING_TABLE,
-                 BREWING_STAND,
-                 GRINDSTONE,
-                 LECTERN,
-                 BEACON,
-                 LOOM,
-                 // Pots
-                 DECORATED_POT, FLOWER_POT,
-                 // Music
-                 JUKEBOX, NOTE_BLOCK,
-                 // Redstone
-                 DISPENSER, DROPPER, HOPPER,
-                 LEVER, REPEATER,
-                 // Misc
-                 BELL, LODESTONE, RESPAWN_ANCHOR, VAULT, CHISELED_BOOKSHELF,
-                 // Operator Blocks
-                 COMMAND_BLOCK, CHAIN_COMMAND_BLOCK, REPEATING_COMMAND_BLOCK, STRUCTURE_BLOCK, JIGSAW,
-                 // Claim Blocks (Hardcoded; To be replaced with Claims or WorldGuard API in the future)
-                 COAL_BLOCK, IRON_BLOCK, GOLD_BLOCK, DIAMOND_BLOCK, EMERALD_BLOCK, NETHERITE_BLOCK -> true;
-            // ...
-            default -> false;
-        };
     }
 
 }

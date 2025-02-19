@@ -165,12 +165,15 @@ public final class BasketHandler implements Module, Listener {
     public void onPlayerInteract(final @NotNull PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.HAND) {
             if (event.getItem() != null && event.getItem().getPersistentDataContainer().has(DATA_KEY, PersistentDataType.BYTE_ARRAY) == true) {
+                // Returning if player clicked on an interactable block.
+                if (event.getClickedBlock() != null && event.getClickedBlock().isInteractable() == true && event.getPlayer().isSneaking() == false)
+                    return;
                 // Getting serialized data of entity stored by this item.
                 final byte[] data = event.getItem().getPersistentDataContainer().getOrDefault(DATA_KEY, PersistentDataType.BYTE_ARRAY, new byte[0]);
                 // Continuing for non-existent / empty values.
                 if (data.length == 0)
                     return;
-                // Cancelling the event, as we're dealing with a valid item.
+                // Cancelling the event.
                 event.setCancelled(true);
                 // Removing item from player's hand.
                 if (event.getPlayer().getGameMode() == GameMode.SURVIVAL)
