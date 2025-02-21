@@ -124,6 +124,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.colored_nametags")
     public static boolean ENABLED_MODULES_COLORED_NAMETAGS;
 
+    @JsonPath("enabled_modules.better_bone_meal")
+    public static boolean ENABLED_MODULES_BETTER_BONE_MEAL;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.basket")
