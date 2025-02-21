@@ -51,7 +51,7 @@ public final class StrideEnchantment implements Module, Listener {
 
     @Override
     public void load() {
-        if (PluginConfig.ENABLED_MODULES_BAIT_ENCHANTMENT == true)
+        if (PluginConfig.ENABLED_MODULES_STRIDE_ENCHANTMENT == true)
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
