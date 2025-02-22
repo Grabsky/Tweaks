@@ -240,6 +240,11 @@ public final class ReusableVaultsHandler implements Module, Listener {
                         // Scheduling stuff that needs to be done on the main thread.
                         plugin.getBedrockScheduler().run(1L, (_) -> {
                             final org.bukkit.block.TrialSpawner blockState = (TrialSpawner) location.getBlock().getState();
+                            // Returning empty string if spawner is currently active.
+                            if (blockState.getNextSpawnAttempt() != 0) {
+                                spawnersCache.put(player.getUniqueId() + "/" + params, "");
+                                return;
+                            }
                             // Getting the timestamp at which cooldown is ending at.
                             final long cooldownEndsAt = blockState.getCooldownEnd();
                             // Calculating the time that is left on the spawner.
