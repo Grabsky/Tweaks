@@ -47,6 +47,8 @@ public final class BetterBoneMealHandler implements Module, Listener {
         HandlerList.unregisterAll(this);
     }
 
+    // NOTE: Using Bone Meal currently does not cancel second hand action. Might look into that in the future.
+    // NOTE: Using Bone Meal in off-hand is currently not covered.
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onBoneMealUse(final @NotNull PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getHand() == EquipmentSlot.HAND && event.getItem() != null && event.getItem().getType() == Material.BONE_MEAL) {
@@ -67,6 +69,8 @@ public final class BetterBoneMealHandler implements Module, Listener {
                     // Removing 1x Bone Meal from the stack.
                     if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
                         event.getPlayer().getInventory().getItemInMainHand().setAmount(event.getPlayer().getInventory().getItemInMainHand().getAmount() - 1);
+                    // Swinging player's hand.
+                    event.getPlayer().swingMainHand();
                     // Attempting to grow the plant with 50% chance.
                     if (Math.random() > 0.5) {
                         newBlock.setType(Material.SUGAR_CANE);
@@ -94,6 +98,8 @@ public final class BetterBoneMealHandler implements Module, Listener {
                     // Removing 1x Bone Meal from the stack.
                     if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
                         event.getPlayer().getInventory().getItemInMainHand().setAmount(event.getPlayer().getInventory().getItemInMainHand().getAmount() - 1);
+                    // Swinging player's hand.
+                    event.getPlayer().swingMainHand();
                     // Attempting to grow the plant with 50% chance.
                     if (Math.random() > 0.5) {
                         newBlock.setType(Material.CACTUS);
@@ -114,6 +120,8 @@ public final class BetterBoneMealHandler implements Module, Listener {
                     // Removing one Bone Meal from the player's hand.
                     if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
                         event.getPlayer().getInventory().getItemInMainHand().setAmount(event.getPlayer().getInventory().getItemInMainHand().getAmount() - 1);
+                    // Swinging player's hand.
+                    event.getPlayer().swingMainHand();
                     // Duplicating the item and dropping it on the ground.
                     block.getDrops().forEach(drop -> block.getLocation().getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), drop));
                     // Spawning particles and playing sound.
