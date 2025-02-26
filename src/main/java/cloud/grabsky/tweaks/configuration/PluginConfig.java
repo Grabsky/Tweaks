@@ -127,6 +127,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.better_bone_meal")
     public static boolean ENABLED_MODULES_BETTER_BONE_MEAL;
 
+    @JsonPath("enabled_modules.forever_young")
+    public static boolean ENABLED_MODULES_FOREVER_YOUNG;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.basket")
@@ -273,6 +276,14 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("colored_nametags_settings.colors")
     public static Map<Material, String> COLORED_NAMETAGS_SETTINGS_COLORS;
+
+    // Forever Young Settings
+
+    @JsonPath("forever_young_settings.age_lock_item")
+    public static ItemStack FOREVER_YOUNG_SETTINGS_AGE_LOCK_ITEM;
+
+    @JsonPath("forever_young_settings.age_unlock_item")
+    public static ItemStack FOREVER_YOUNG_SETTINGS_AGE_UNLOCK_ITEM;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.
