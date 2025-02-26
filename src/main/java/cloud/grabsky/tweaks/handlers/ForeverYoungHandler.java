@@ -18,6 +18,7 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Breedable;
@@ -65,7 +66,8 @@ public final class ForeverYoungHandler implements Module, Listener {
                 // Swinging player's hand.
                 event.getPlayer().swingMainHand();
                 // Removing item from the player.
-                item.subtract(1);
+                if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
+                    item.subtract(1);
                 // Playing sound.
                 event.getRightClicked().getWorld().playSound(event.getRightClicked().getLocation(), Sound.ENTITY_FOX_EAT, SoundCategory.NEUTRAL, 0.5F, 1.0F);
                 // Locking the age.
@@ -75,7 +77,8 @@ public final class ForeverYoungHandler implements Module, Listener {
                 // Swinging player's hand.
                 event.getPlayer().swingMainHand();
                 // Removing item from the player.
-                item.subtract(1);
+                if (event.getPlayer().getGameMode() != GameMode.CREATIVE)
+                    item.subtract(1);
                 // Playing sound.
                 event.getRightClicked().getWorld().playSound(event.getRightClicked().getLocation(), Sound.ENTITY_FOX_EAT, SoundCategory.NEUTRAL, 0.5F, 1.0F);
                 // Unlocking the age.
