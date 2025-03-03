@@ -17,7 +17,7 @@
             "base": {
                 "chance": 1.0,
                 "required_attacker": ["minecraft:player"],
-                "message": "<dark_gray>› <green>Gratulacje! <gray>Zdobyłeś głowę gracza: <item>",
+                "message": "<dark_gray>› <green>Gratulacje! <gray>Zdobyłeś <item><reset><gray> za pokonanie gracza.",
                 // This will be filled with the victim's skin texture.
                 "item": { "material": "minecraft:player_head" }
             }
@@ -27,7 +27,7 @@
                 "item": {
                     "material": "minecraft:player_head",
                     "meta": {
-                        "name": { "translate": "item.firedot.allay_head",  "color": "green",  "fallback": "Allay Head" },
+                        "name": { "translate": "item.firedot.allay_head",  "color": "#1CC8FC",  "fallback": "Allay Head" },
                         "skull_texture": "http://textures.minecraft.net/texture/df5de940bfe499c59ee8dac9f9c3919e7535eff3a9acb16f4842bf290f4c679f"
                     }
                 }
