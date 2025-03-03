@@ -34,6 +34,7 @@ import org.bukkit.entity.Fox;
 import org.bukkit.entity.Frog;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Llama;
+import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Panda;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
@@ -105,6 +106,7 @@ public final class MobHeadsHandler implements Module, Listener {
                 case Sheep sheep -> container.variants().getOrDefault(requirePresent(sheep.getColor(), DyeColor.WHITE).name().toLowerCase(), null);
                 case Shulker shulker -> container.variants().getOrDefault(requirePresent(shulker.getColor(), DyeColor.PURPLE).name().toLowerCase(), null);
                 case Wolf wolf -> container.variants().getOrDefault(wolf.getVariant().getKey().asString(), null);
+                case MushroomCow mushroomCow -> container.variants().getOrDefault(mushroomCow.getVariant().name().toLowerCase(), null);
                 default -> container.base();
             } : container.base();
             // Using base entry as default.
