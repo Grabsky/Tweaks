@@ -41,9 +41,9 @@ dependencies {
         exclude group: "cloud.grabsky", module: "bedrock"
     }
     // Dependencies (My Libraries) (Shaded)
-    implementation("cloud.grabsky:bedrock:1.21-63")
+    implementation("cloud.grabsky:bedrock:1.21-64")
     implementation("cloud.grabsky:commands:1.20.1-37")
-    implementation("cloud.grabsky:configuration-paper:1.21.3-45")
+    implementation("cloud.grabsky:configuration-paper:1.21.4-51")
     // Dependencies (Other Libraries) (Shaded)
     implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }

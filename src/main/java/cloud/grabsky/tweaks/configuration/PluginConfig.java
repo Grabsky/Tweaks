@@ -130,6 +130,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.forever_young")
     public static boolean ENABLED_MODULES_FOREVER_YOUNG;
 
+    @JsonPath("enabled_modules.mob_heads")
+    public static boolean ENABLED_MODULES_MOB_HEADS;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.basket")
