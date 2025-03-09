@@ -84,7 +84,7 @@ public final class MobHeadsHandler implements Module, Listener {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onEntityDeath(final @NotNull EntityDeathEvent event) {
         final NamespacedKey key = event.getEntityType().getKey();
         // Filtering to only listen for mobs.

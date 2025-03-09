@@ -31,15 +31,22 @@ import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockType;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,11 +58,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
+@SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class MagnetEnchantment implements Module, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
+
+    private static final HashSet<BlockType> SUPPORTED_CROPS = new HashSet<>() {{
+        add(BlockType.WHEAT);
+        add(BlockType.CARROTS);
+        add(BlockType.POTATOES);
+        add(BlockType.BEETROOTS);
+        add(BlockType.COCOA);
+        add(BlockType.NETHER_WART);
+        add(BlockType.MELON);
+        add(BlockType.MELON_STEM);
+        add(BlockType.PUMPKIN);
+        add(BlockType.PUMPKIN_STEM);
+    }};
 
     @Override
     public void load() {
@@ -75,47 +96,104 @@ public final class MagnetEnchantment implements Module, Listener {
         final Player player = event.getPlayer();
         // Checking if player is in Survival game mode
         if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE) {
-            final Block block = event.getBlock();
-            // Checking if player is breaking an ore
-            if (MaterialTags.ORES.isTagged(block) == true || MaterialTags.RAW_ORE_BLOCKS.isTagged(block) == true) {
-                final ItemStack tool = player.getInventory().getItemInMainHand();
-                // Checking if player's tool is enchanted with Magnetic enchantment (my way of storing enchantments)
-                if (tool.isEnchantedWith("firedot:magnet") == true) {
-                    // Getting the experience player would get from destroying this block.
-                    final int experience = event.getExpToDrop();
-                    // Disabling vanilla drop of experience, will be added to the player in the next step.
-                    event.setExpToDrop(0);
-                    // Dropping experience directly at the player's location to make them pick it up instantly.
-                    if (experience != 0) player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
+            final ItemStack tool = player.getInventory().getItemInMainHand();
+            // Checking if player's tool is enchanted with Magnet enchantment.
+            if (tool.isEnchantedWith("firedot:magnet") == true) {
+                final Block block = event.getBlock();
+                if (MaterialTags.PICKAXES.isTagged(tool) == true && (MaterialTags.ORES.isTagged(block) == true || MaterialTags.RAW_ORE_BLOCKS.isTagged(block) == true) == false)
+                    return;
+                if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.contains(block.getType().asBlockType()) == false)
+                    return;
+                // Getting the experience player would get from destroying this block.
+                final int experience = event.getExpToDrop();
+                // Disabling vanilla drop of experience, will be added to the player in the next step.
+                event.setExpToDrop(0);
+                // Dropping experience directly at the player's location to make them pick it up instantly.
+                if (experience != 0)
+                    player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
                         orb.setExperience(experience);
                     });
-                    // Getting drops; Ores drop only one ItemStack, so we can safely get the first element from the Collection
-                    event.getBlock().getDrops(tool).forEach(drop -> {
-                        // Checking if player has space for an item
-                        if (player.getInventory().hasSpace(drop) == true) {
-                            // Setting drops to false as player has enough space for an item
-                            event.setDropItems(false);
-                            // Adding drops directly to the player's inventory.
-                            player.getInventory().addItem(drop);
-                            // Creating next entity identifier for use with packets.
-                            final int id = Bukkit.getUnsafe().nextEntityId();
-                            // Doing packet stuff... asynchronously.
-                            plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                                final Location location = new Location(block.getX() + 0.5D, block.getY() + 0.5D, block.getZ() + 0.5D, 0F, 0F);
-                                // Creating PlayServerSpawnEntity packet.
-                                final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
-                                // Creating PlayServerEntityMetadata packet.
-                                final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(drop))));
-                                // Creating PlayServerCollectItem packet.
-                                final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), drop.getAmount());
-                                // Sending packets...
-                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
-                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
-                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
-                            });
-                        }
+                // Getting drops; Ores drop only one ItemStack, so we can safely get the first element from the Collection
+                event.getBlock().getDrops(tool).forEach(drop -> {
+                    // Checking if player has space for an item
+                    if (player.getInventory().hasSpace(drop) == true) {
+                        // Setting drops to false as player has enough space for an item
+                        event.setDropItems(false);
+                        // Adding drops directly to the player's inventory.
+                        player.getInventory().addItem(drop);
+                        // Creating next entity identifier for use with packets.
+                        final int id = Bukkit.getUnsafe().nextEntityId();
+                        // Scheduling packet stuff asynchronously.
+                        plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                            final Location location = new Location(block.getX() + 0.5D, block.getY() + 0.5D, block.getZ() + 0.5D, 0F, 0F);
+                            // Creating PlayServerSpawnEntity packet.
+                            final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
+                            // Creating PlayServerEntityMetadata packet.
+                            final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(drop))));
+                            // Creating PlayServerCollectItem packet.
+                            final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), drop.getAmount());
+                            // Sending packets...
+                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
+                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
+                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityDeath(final @NotNull EntityDeathEvent event) {
+        if (event.getDamageSource().getCausingEntity() instanceof Player player && event.getEntity() instanceof Mob mob) {
+            // Returning in case player is no longer online. Not sure if needed, just in case.
+            if (player.isOnline() == false || player.isConnected() == false)
+                return;
+            // Getting the tool in player's hand.
+            final ItemStack tool = player.getInventory().getItemInMainHand();
+            // Checking if player's tool is enchanted with Magnet enchantment.
+            if (tool.isEnchantedWith("firedot:magnet") == true) {
+                if (MaterialTags.SWORDS.isTagged(tool) == false && tool.getType().asItemType() != ItemType.BOW && tool.getType().asItemType() != ItemType.CROSSBOW)
+                    return;
+                // Returning for distances greater than 24 blocks. (Bow / Crossbow) (24x24 = 576)
+                if (player.getLocation().distanceSquared(event.getEntity().getLocation()) > 576)
+                    return;
+                // Getting the experience player would get from destroying this block.
+                final int experience = event.getDroppedExp();
+                // Disabling vanilla drop of experience, will be added to the player in the next step.
+                event.setDroppedExp(0);
+                // Dropping experience directly at the player's location to make them pick it up instantly.
+                if (experience != 0)
+                    player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
+                        orb.setExperience(experience);
                     });
-                }
+                final List<ItemStack> drops = new ArrayList<>(event.getDrops());
+                // Getting drops; Ores drop only one ItemStack, so we can safely get the first element from the Collection
+                drops.forEach(drop -> {
+                    // Checking if player has space for an item
+                    if (player.getInventory().hasSpace(drop) == true) {
+                        // Setting drops to false as player has enough space for an item
+                        event.getDrops().remove(drop);
+                        // Adding drops directly to the player's inventory.
+                        player.getInventory().addItem(drop);
+                        // Creating next entity identifier for use with packets.
+                        final int id = Bukkit.getUnsafe().nextEntityId();
+                        // Scheduling packet stuff asynchronously.
+                        plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                            final Location location = new Location(mob.getLocation().getX() + 0.5D, mob.getLocation().getY() + 0.5D, mob.getLocation().getZ() + 0.5D, 0F, 0F);
+                            // Creating PlayServerSpawnEntity packet.
+                            final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
+                            // Creating PlayServerEntityMetadata packet.
+                            final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(drop))));
+                            // Creating PlayServerCollectItem packet.
+                            final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), drop.getAmount());
+                            // Sending packets...
+                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
+                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
+                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+                        });
+                    }
+                });
             }
         }
     }
