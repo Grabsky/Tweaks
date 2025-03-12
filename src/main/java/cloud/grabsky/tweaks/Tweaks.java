@@ -26,6 +26,7 @@ import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.configuration.object.EntityLootContainer;
 import cloud.grabsky.tweaks.configuration.object.EntityLootEntry;
 import cloud.grabsky.tweaks.enchantments.BaitEnchantment;
+import cloud.grabsky.tweaks.enchantments.GardenerEnchantment;
 import cloud.grabsky.tweaks.enchantments.MagnetEnchantment;
 import cloud.grabsky.tweaks.enchantments.SonicShieldEnchantment;
 import cloud.grabsky.tweaks.enchantments.StrideEnchantment;
@@ -100,6 +101,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         this.modules = List.of(
                 // Enchantments
                 new SonicShieldEnchantment(this),
+                new GardenerEnchantment(this),
                 new MagnetEnchantment(this),
                 new BaitEnchantment(this),
                 new StrideEnchantment(this),

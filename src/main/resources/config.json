@@ -2,6 +2,7 @@
     "enabled_modules": {
         // Enchantments
         "sonic_shield_enchantment": false,
+        "gardener_enchantment": false,
         "magnet_enchantment": false,
         "bait_enchantment": false,
         "stride_enchantment": false,

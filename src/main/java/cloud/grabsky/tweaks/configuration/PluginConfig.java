@@ -47,6 +47,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.sonic_shield_enchantment")
     public static boolean ENABLED_MODULES_SONIC_SHIELD_ENCHANTMENT;
 
+    @JsonPath("enabled_modules.gardener_enchantment")
+    public static boolean ENABLED_MODULES_GARDENER_ENCHANTMENT;
+
     @JsonPath("enabled_modules.bait_enchantment")
     public static boolean ENABLED_MODULES_BAIT_ENCHANTMENT;
 

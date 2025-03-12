@@ -18,6 +18,7 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import com.destroystokyo.paper.MaterialSetTag;
 import com.destroystokyo.paper.MaterialTags;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
@@ -30,8 +31,10 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSp
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockType;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
@@ -40,13 +43,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,18 +68,47 @@ public final class MagnetEnchantment implements Module, Listener {
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
-    private static final HashSet<BlockType> SUPPORTED_CROPS = new HashSet<>() {{
-        add(BlockType.WHEAT);
-        add(BlockType.CARROTS);
-        add(BlockType.POTATOES);
-        add(BlockType.BEETROOTS);
-        add(BlockType.COCOA);
-        add(BlockType.NETHER_WART);
-        add(BlockType.MELON);
-        add(BlockType.MELON_STEM);
-        add(BlockType.PUMPKIN);
-        add(BlockType.PUMPKIN_STEM);
-    }};
+    // Holds all blocks and drops supported by the HOE handler for the MAGNET enchantment.
+    private static final MaterialSetTag SUPPORTED_CROPS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_crops"))
+            .add(Material.WHEAT)
+            .add(Material.WHEAT_SEEDS)
+            .add(Material.CARROT)
+            .add(Material.CARROTS)
+            .add(Material.POTATO)
+            .add(Material.POTATOES)
+            .add(Material.BEETROOT)
+            .add(Material.BEETROOTS)
+            .add(Material.COCOA)
+            .add(Material.COCOA_BEANS)
+            .add(Material.NETHER_WART)
+            .add(Material.MELON)
+            .add(Material.MELON_STEM)
+            .add(Material.MELON_SLICE)
+            .add(Material.PUMPKIN)
+            .add(Material.PUMPKIN_STEM)
+            // Unfortunately this isExperimental, but should generally work now that we listen to BlockDropItemEvent.
+            // .add(Material.SUGAR_CANE)
+            // .add(Material.BAMBOO)
+            // .add(Material.CACTUS)
+            .lock();
+
+    // Holds all blocks and drops supported by the PICKAXE handler for the MAGNET enchantment.
+    private static final MaterialSetTag SUPPORTED_MINERALS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_minerals"))
+            .add(MaterialTags.ORES)
+            .add(MaterialTags.RAW_ORES)
+            .add(MaterialTags.RAW_ORE_BLOCKS)
+            .add(MaterialTags.DEEPSLATE_ORES)
+            .add(Material.DIAMOND)
+            .add(Material.EMERALD)
+            .add(Material.LAPIS_LAZULI)
+            .add(Material.REDSTONE)
+            .add(Material.QUARTZ)
+            .add(Material.GOLD_NUGGET)
+            .add(Material.AMETHYST_CLUSTER)
+            .add(Material.AMETHYST_SHARD)
+            // Echo Shard has a small chance to drop when destroying Amethyst Cluster on our server.
+            .add(Material.ECHO_SHARD)
+            .lock();
 
     @Override
     public void load() {
@@ -91,7 +123,7 @@ public final class MagnetEnchantment implements Module, Listener {
         HandlerList.unregisterAll(this);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(final @NotNull BlockBreakEvent event) {
         final Player player = event.getPlayer();
         // Checking if player is in Survival game mode
@@ -100,44 +132,73 @@ public final class MagnetEnchantment implements Module, Listener {
             // Checking if player's tool is enchanted with Magnet enchantment.
             if (tool.isEnchantedWith("firedot:magnet") == true) {
                 final Block block = event.getBlock();
-                if (MaterialTags.PICKAXES.isTagged(tool) == true && (MaterialTags.ORES.isTagged(block) == true || MaterialTags.RAW_ORE_BLOCKS.isTagged(block) == true) == false)
+                // Returning if pickaxe enchanted with magnet destroyed non-ore block.
+                if (MaterialTags.PICKAXES.isTagged(tool) == true && SUPPORTED_MINERALS.isTagged(block) == false)
                     return;
-                if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.contains(block.getType().asBlockType()) == false)
+                // Returning if hoe enchanted with magnet destroyed non-crop block.
+                if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(block) == false)
                     return;
                 // Getting the experience player would get from destroying this block.
                 final int experience = event.getExpToDrop();
                 // Disabling vanilla drop of experience, will be added to the player in the next step.
                 event.setExpToDrop(0);
                 // Dropping experience directly at the player's location to make them pick it up instantly.
-                if (experience != 0)
-                    player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
-                        orb.setExperience(experience);
-                    });
-                // Getting drops; Ores drop only one ItemStack, so we can safely get the first element from the Collection
-                event.getBlock().getDrops(tool).forEach(drop -> {
-                    // Checking if player has space for an item
-                    if (player.getInventory().hasSpace(drop) == true) {
-                        // Setting drops to false as player has enough space for an item
-                        event.setDropItems(false);
+                if (experience != 0) player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
+                    orb.setExperience(experience);
+                });
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockDropItem(final @NotNull BlockDropItemEvent event) {
+        final Player player = event.getPlayer();
+        // Checking if player is in Survival game mode
+        if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE) {
+            final ItemStack tool = player.getInventory().getItemInMainHand();
+            // Checking if player's tool is enchanted with Magnet enchantment.
+            if (tool.isEnchantedWith("firedot:magnet") == true) {
+                // Getting the BlockState associated with the event.
+                final BlockState blockState = event.getBlockState();
+                // Returning if pickaxe enchanted with magnet destroyed non-ore block.
+                if (MaterialTags.PICKAXES.isTagged(tool) == true && SUPPORTED_MINERALS.isTagged(blockState) == false)
+                    return;
+                // Returning if hoe enchanted with magnet destroyed non-crop block.
+                if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(blockState) == false)
+                    return;
+                // Removing items...
+                event.getItems().removeIf(item -> {
+                    // Skipping items that are not supported by the pickaxe.
+                    if (MaterialTags.PICKAXES.isTagged(tool) == true && SUPPORTED_MINERALS.isTagged(item.getItemStack()) == false)
+                        return false;
+                    // Skipping items that are not supported by the hoe.
+                    if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(item.getItemStack()) == false)
+                        return false;
+                    // Checking if player has space for an item.
+                    if (player.getInventory().hasSpace(item.getItemStack()) == true) {
                         // Adding drops directly to the player's inventory.
-                        player.getInventory().addItem(drop);
+                        player.getInventory().addItem(item.getItemStack());
                         // Creating next entity identifier for use with packets.
                         final int id = Bukkit.getUnsafe().nextEntityId();
                         // Scheduling packet stuff asynchronously.
                         plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                            final Location location = new Location(block.getX() + 0.5D, block.getY() + 0.5D, block.getZ() + 0.5D, 0F, 0F);
+                            final Location location = new Location(event.getBlockState().getX() + 0.5D, event.getBlockState().getY() + 0.5D, event.getBlockState().getZ() + 0.5D, 0F, 0F);
                             // Creating PlayServerSpawnEntity packet.
                             final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
                             // Creating PlayServerEntityMetadata packet.
-                            final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(drop))));
+                            final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(item.getItemStack()))));
                             // Creating PlayServerCollectItem packet.
-                            final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), drop.getAmount());
+                            final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), item.getItemStack().getAmount());
                             // Sending packets...
                             PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
                             PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
                             PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
                         });
+                        // Returning true, which will cause the item to be removed from the list.
+                        return true;
                     }
+                    // Returning false, which will cause the item to not be removed.
+                    return false;
                 });
             }
         }
