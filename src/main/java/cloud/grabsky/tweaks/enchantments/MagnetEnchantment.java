@@ -14,6 +14,17 @@
  */
 package cloud.grabsky.tweaks.enchantments;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.ExtensionMethod;
+
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
@@ -30,10 +41,12 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Mob;
@@ -48,17 +61,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.jetbrains.annotations.NotNull;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
 @SuppressWarnings("UnstableApiUsage")
@@ -83,13 +85,15 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.NETHER_WART)
             .add(Material.MELON)
             .add(Material.MELON_STEM)
+            .add(Material.MELON_SEEDS)
             .add(Material.MELON_SLICE)
             .add(Material.PUMPKIN)
             .add(Material.PUMPKIN_STEM)
-            // Unfortunately this isExperimental, but should generally work now that we listen to BlockDropItemEvent.
-            // .add(Material.SUGAR_CANE)
-            // .add(Material.BAMBOO)
-            // .add(Material.CACTUS)
+            .add(Material.PUMPKIN_SEEDS)
+            // Experimental
+            .add(Material.SUGAR_CANE)
+            .add(Material.BAMBOO)
+            .add(Material.CACTUS)
             .lock();
 
     // Holds all blocks and drops supported by the PICKAXE handler for the MAGNET enchantment.
@@ -166,6 +170,41 @@ public final class MagnetEnchantment implements Module, Listener {
                 // Returning if hoe enchanted with magnet destroyed non-crop block.
                 if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(blockState) == false)
                     return;
+                // ...
+                if (blockState.getType() == Material.SUGAR_CANE || blockState.getType() == Material.BAMBOO || blockState.getType() == Material.CACTUS) {
+                    // Iterating over blocks above the broken block.
+                    Block relative = blockState.getWorld().getBlockAt(blockState.getX(), blockState.getY() + 1, blockState.getZ());
+                    // ...
+                    while (relative.getType() == blockState.getType()) {
+                        // Iterating over drops and adding them to the player's inventory.
+                        relative.getDrops(tool, player).forEach(item -> {
+                            // Adding drops directly to the player's inventory.
+                            player.getInventory().addItem(item);
+                            // Creating next entity identifier for use with packets.
+                            final int id = Bukkit.getUnsafe().nextEntityId();
+                            // Scheduling packet stuff asynchronously.
+                            plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                                final Location location = new Location(event.getBlockState().getX() + 0.5D, event.getBlockState().getY() + 0.5D, event.getBlockState().getZ() + 0.5D, 0F, 0F);
+                                // Creating PlayServerSpawnEntity packet.
+                                final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
+                                // Creating PlayServerEntityMetadata packet.
+                                final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(item))));
+                                // Creating PlayServerCollectItem packet.
+                                final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), item.getAmount());
+                                // Sending packets...
+                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
+                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
+                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+                            });
+                        });
+                        // Playing the block break effect.
+                        relative.getWorld().playEffect(relative.getLocation(), Effect.STEP_SOUND, relative.getBlockData());
+                        // Removing the block from the world.
+                        relative.setType(Material.AIR);
+                        // Updating the relative block.
+                        relative = relative.getRelative(BlockFace.UP);
+                    }
+                }
                 // Removing items...
                 event.getItems().removeIf(item -> {
                     // Skipping items that are not supported by the pickaxe.

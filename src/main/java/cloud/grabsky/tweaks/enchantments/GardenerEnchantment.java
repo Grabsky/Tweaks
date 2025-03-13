@@ -60,10 +60,10 @@ public final class GardenerEnchantment implements Module, Listener {
         put(Material.NETHER_WART, Material.NETHER_WART);
         put(Material.MELON_STEM, Material.MELON_SEEDS);
         put(Material.PUMPKIN_STEM, Material.PUMPKIN_SEEDS);
-        // Experimental; Need special treatment, like getting the lowest block.
-        // put(Material.SUGAR_CANE, Material.SUGAR_CANE);
-        // put(Material.CACTUS, Material.CACTUS);
-        // put(Material.BAMBOO, Material.BAMBOO);
+        // NOTE: Following blocks are not implemented (yet?) as they need special treatment, like getting the lowest block.
+        //  put(Material.SUGAR_CANE, Material.SUGAR_CANE);
+        //  put(Material.CACTUS, Material.CACTUS);
+        //  put(Material.BAMBOO, Material.BAMBOO);
     }};
 
     @Override
@@ -82,7 +82,7 @@ public final class GardenerEnchantment implements Module, Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockDropItem(final @NotNull BlockDropItemEvent event) {
         final Player player = event.getPlayer();
-        // Checking if player is in Survival game mode
+        // Checking if player is in Survival or Adventure game mode.
         if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE) {
             final ItemStack tool = player.getInventory().getItemInMainHand();
             // Checking if player's tool is enchanted with Magnet enchantment.
@@ -137,7 +137,7 @@ public final class GardenerEnchantment implements Module, Listener {
                         // Spawning particles.
                         switch (blockType) {
                             case WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, MELON_STEM, PUMPKIN_STEM -> {
-                                event.getBlockState().getWorld().spawnParticle(Particle.BLOCK_CRUMBLE, event.getBlockState().getLocation().clone().add(0.5D, 0.15D, 0.5D), 8, 0.25, 0.05, 0.25);
+                                event.getBlockState().getWorld().spawnParticle(Particle.EGG_CRACK, event.getBlockState().getLocation().clone().add(0.5D, 0.15D, 0.5D), 8, 0.25, 0.05, 0.25);
                             }
                             case COCOA -> {
                                 // EMPTY; QUITE DIFFICULT TO GET THIS LOOK GOOD
