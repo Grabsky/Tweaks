@@ -124,26 +124,26 @@ public final class GardenerEnchantment implements Module, Listener {
                 }
                 // Continuing with the logic, planting the seed on the ground.
                 if (isConsumed == true) {
-                    //plugin.getBedrockScheduler().run(1L, (_) -> {
-                        // Creating BlockData of the same block that has been destroyed.
-                        final BlockData data = event.getBlockState().getType().createBlockData();
-                        // Rotating the block, if necessary. (eg. cocoa)
-                        if (event.getBlockState().getBlockData() instanceof Directional oldData && data instanceof Directional newData)
-                            newData.setFacing(oldData.getFacing());
-                        // Setting the block.
-                        event.getBlockState().getWorld().setBlockData(event.getBlockState().getLocation(), data);
-                        // Playing the plant sound.
-                        event.getBlockState().getWorld().playSound(event.getBlockState().getLocation(), event.getBlockState().getBlockData().getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-                        // Spawning particles.
-                        switch (blockType) {
-                            case WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, MELON_STEM, PUMPKIN_STEM -> {
-                                event.getBlockState().getWorld().spawnParticle(Particle.EGG_CRACK, event.getBlockState().getLocation().clone().add(0.5D, 0.15D, 0.5D), 8, 0.25, 0.05, 0.25);
-                            }
-                            case COCOA -> {
-                                // EMPTY; QUITE DIFFICULT TO GET THIS LOOK GOOD
-                            }
+                    // Damaging player's tool. This should take Unbreaking into account.
+                    tool.damage(1, player);
+                    // Creating BlockData of the same block that has been destroyed.
+                    final BlockData data = event.getBlockState().getType().createBlockData();
+                    // Rotating the block, if necessary. (eg. cocoa)
+                    if (event.getBlockState().getBlockData() instanceof Directional oldData && data instanceof Directional newData)
+                        newData.setFacing(oldData.getFacing());
+                    // Setting the block.
+                    event.getBlockState().getWorld().setBlockData(event.getBlockState().getLocation(), data);
+                    // Playing the plant sound.
+                    event.getBlockState().getWorld().playSound(event.getBlockState().getLocation(), event.getBlockState().getBlockData().getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    // Spawning particles.
+                    switch (blockType) {
+                        case WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, MELON_STEM, PUMPKIN_STEM -> {
+                            event.getBlockState().getWorld().spawnParticle(Particle.EGG_CRACK, event.getBlockState().getLocation().clone().add(0.5D, 0.15D, 0.5D), 8, 0.25, 0.05, 0.25);
                         }
-                    //});
+                        case COCOA -> {
+                            // EMPTY; QUITE DIFFICULT TO GET THIS LOOK GOOD
+                        }
+                    }
                 }
             }
         }
