@@ -80,6 +80,7 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.POTATOES)
             .add(Material.BEETROOT)
             .add(Material.BEETROOTS)
+            .add(Material.BEETROOT_SEEDS)
             .add(Material.COCOA)
             .add(Material.COCOA_BEANS)
             .add(Material.NETHER_WART)
