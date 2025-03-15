@@ -104,6 +104,7 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(MaterialTags.RAW_ORE_BLOCKS)
             .add(MaterialTags.DEEPSLATE_ORES)
             .add(Material.DIAMOND)
+            .add(Material.COAL)
             .add(Material.EMERALD)
             .add(Material.LAPIS_LAZULI)
             .add(Material.REDSTONE)
