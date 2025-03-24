@@ -21,10 +21,7 @@ import cloud.grabsky.configuration.ConfigurationMapper;
 import cloud.grabsky.configuration.exception.ConfigurationMappingException;
 import cloud.grabsky.configuration.paper.PaperConfigurationMapper;
 import cloud.grabsky.tweaks.command.TweaksCommand;
-import cloud.grabsky.tweaks.configuration.HeadsConfig;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
-import cloud.grabsky.tweaks.configuration.object.EntityLootContainer;
-import cloud.grabsky.tweaks.configuration.object.EntityLootEntry;
 import cloud.grabsky.tweaks.enchantments.BaitEnchantment;
 import cloud.grabsky.tweaks.enchantments.GardenerEnchantment;
 import cloud.grabsky.tweaks.enchantments.MagnetEnchantment;
@@ -34,26 +31,25 @@ import cloud.grabsky.tweaks.handlers.ArmorStandHandler;
 import cloud.grabsky.tweaks.handlers.BalancedKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.BalancedVillagerRestockHandler;
 import cloud.grabsky.tweaks.handlers.BetterBoneMealHandler;
-import cloud.grabsky.tweaks.handlers.ColoredNametagsHandler;
-import cloud.grabsky.tweaks.handlers.ForeverYoungHandler;
-import cloud.grabsky.tweaks.handlers.MobHeadsHandler;
-import cloud.grabsky.tweaks.items.BasketHandler;
 import cloud.grabsky.tweaks.handlers.BreakingMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.CampfireHandler;
 import cloud.grabsky.tweaks.handlers.ChairsHandler;
 import cloud.grabsky.tweaks.handlers.ClockHandler;
+import cloud.grabsky.tweaks.handlers.ColoredNametagsHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
 import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
 import cloud.grabsky.tweaks.handlers.DamageMultipliersHandler;
 import cloud.grabsky.tweaks.handlers.DimensionSoftLockHandler;
 import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
+import cloud.grabsky.tweaks.handlers.ForeverYoungHandler;
+import cloud.grabsky.tweaks.handlers.ImprovedEndPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
-import cloud.grabsky.tweaks.handlers.ImprovedEndPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.WitherSpawnWhitelistHandler;
+import cloud.grabsky.tweaks.items.BasketHandler;
 import cloud.grabsky.tweaks.items.EnderiteItem;
 import cloud.grabsky.tweaks.items.ScrollItem;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -93,10 +89,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         // Updating the main thread executor.
         MAIN_THREAD = Bukkit.getScheduler().getMainThreadExecutor(this);
         // Creating ConfigurationMapper instance.
-        this.mapper = PaperConfigurationMapper.create(moshi -> {
-            moshi.add(EntityLootEntry.Factory.INSTANCE);
-            moshi.add(EntityLootContainer.Factory.INSTANCE);
-        });
+        this.mapper = PaperConfigurationMapper.create();
         // Adding module(s) to a list.
         this.modules = List.of(
                 // Enchantments
@@ -133,7 +126,6 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new ColoredNametagsHandler(this),
                 new BetterBoneMealHandler(this),
                 new ForeverYoungHandler(this),
-                new MobHeadsHandler(this),
                 // Items
                 new ScrollItem(this),
                 new EnderiteItem(this)
@@ -168,11 +160,9 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         try {
             // Ensuring configuration file(s) exist.
             final File config = ensureResourceExistence(this, new File(this.getDataFolder(), "config.json"));
-            final File heads = ensureResourceExistence(this, new File(this.getDataFolder(), "heads.json"));
             // Mapping configuration file(s).
             mapper.map(
-                    ConfigurationHolder.of(PluginConfig.class, config),
-                    ConfigurationHolder.of(HeadsConfig.class, heads)
+                    ConfigurationHolder.of(PluginConfig.class, config)
             );
             // Reloading module(s).
             this.modules.forEach(Module::reload);
