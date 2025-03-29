@@ -75,11 +75,6 @@ public final class BalancedVillagerRestockHandler implements Module, Listener {
             recipe.setUses(0);
             recipe.setMaxUses(1);
         }
-        // Saddle Restock: 12 ➞ 1
-        else if (result.getType() == Material.SADDLE) {
-            recipe.setUses(0);
-            recipe.setMaxUses(1);
-        }
         // Enchanted Book Restock: ??? ➞ ???
         else if (result.getType() == Material.ENCHANTED_BOOK && result.hasData(DataComponentTypes.STORED_ENCHANTMENTS) == true) {
             // Getting the list of enchantments from the enchanted book.
