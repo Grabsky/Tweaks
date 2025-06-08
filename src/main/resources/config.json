@@ -152,6 +152,15 @@
             ],
             "minecraft:wolf": [
                 "<gray><lang:basket.wolf_variant>: <variant>"
+            ],
+            "minecraft:cow": [
+                "<gray><lang:basket.cow_variant>: <variant>"
+            ],
+            "minecraft:pig": [
+                "<gray><lang:basket.pig_variant>: <variant>"
+            ],
+            "minecraft:chicken": [
+                "<gray><lang:basket.chicken_variant>: <variant>"
             ]
         }
     },

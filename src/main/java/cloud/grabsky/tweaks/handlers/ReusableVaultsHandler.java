@@ -20,6 +20,7 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import com.jeff_media.morepersistentdatatypes.DataType;
+import io.papermc.paper.event.block.VaultChangeStateEvent;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -39,7 +40,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.purpurmc.purpur.event.VaultStateChangeEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -146,7 +146,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onVaultStateChange(final @NotNull VaultStateChangeEvent event) {
+    public void onVaultStateChange(final @NotNull VaultChangeStateEvent event) {
         if (event.getNewState() == State.ACTIVE) {
             final org.bukkit.block.Vault blockState = (Vault) event.getBlock().getState();
             // Getting the loot-table of vault associated with the event.
@@ -165,7 +165,7 @@ public final class ReusableVaultsHandler implements Module, Listener {
                 // Cancelling the event.
                 event.setCancelled(true);
                 // Handling a case where previous vault state was 'EJECTING'.
-                if (event.getPreviousState() == State.EJECTING) {
+                if (event.getCurrentState() == State.EJECTING) {
                     final org.bukkit.block.data.type.Vault blockData = (org.bukkit.block.data.type.Vault) event.getBlock().getBlockData();
                     // "Uncancelling" the event.
                     event.setCancelled(false);

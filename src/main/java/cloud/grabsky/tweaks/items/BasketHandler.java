@@ -32,6 +32,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Crafter;
 import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.Cat;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Cow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.Frog;
@@ -40,6 +42,7 @@ import org.bukkit.entity.Llama;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Panda;
 import org.bukkit.entity.Parrot;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Turtle;
@@ -304,6 +307,18 @@ public final class BasketHandler implements Module, Listener {
             // WOLF
             case Wolf wolf -> additionalLoreFormat.stream()
                     .map(format -> format.replace("<variant>", "<lang:basket.wolf_variant." + wolf.getVariant().getKey().getKey() + ">"))
+                    .toList();
+            // COW
+            case Cow cow -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.cow_variant." + cow.getVariant().getKey().getKey() + ">"))
+                    .toList();
+            // PIG
+            case Pig pig -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.pig_variant." + pig.getVariant().getKey().getKey() + ">"))
+                    .toList();
+            // CHICKEN
+            case Chicken chicken -> additionalLoreFormat.stream()
+                    .map(format -> format.replace("<variant>", "<lang:basket.chicken_variant." + chicken.getVariant().getKey().getKey() + ">"))
                     .toList();
             // NO VARIANTS
             default -> null;
