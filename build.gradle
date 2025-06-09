@@ -1,7 +1,8 @@
 plugins {
     id("java-library")
-    id("net.minecrell.plugin-yml.paper") version "0.6.0"
     id("com.gradleup.shadow") version "8.3.5"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("de.eldoria.plugin-yml.paper") version "0.7.1"
 }
 
 group = "cloud.grabsky"
@@ -47,9 +48,12 @@ dependencies {
 }
 
 tasks {
+    runServer {
+        minecraftVersion("1.21.5")
+        jvmArgs("--enable-preview")
+    }
     shadowJar {
         shadowJar.archiveFileName = "${rootProject.name}-${project.version}.jar"
-        relocate("de.tr7zw.changeme.nbtapi", "cloud.grabsky.tweaks.libs.nbt")
     }
     compileJava {
         options.fork = true
@@ -70,15 +74,13 @@ paper {
     }
 }
 
-/* FOR GITHUB ACTIONS */
 
-tasks.register("release") {
-    doLast { print("${version.toString().split('-')[0]} #${System.getenv("GITHUB_RUN_NUMBER")}") }
-}
+// Returns formatted release name. (for GitHub Actions)
+tasks.register("getRelease", () -> print("$VERSION #$RUN_NUMBER"))
 
-tasks.register("tag") {
-    doLast { print(version) }
-}
+// Returns formatted tag name. (for GitHub Actions)
+tasks.register("getTag", () -> print("$VERSION+$RUN_NUMBER"))
+
 
 /* UTILITY METHODS */
 
