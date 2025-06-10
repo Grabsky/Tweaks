@@ -64,14 +64,20 @@ public final class EnderiteItem implements Module, Listener {
         if (base != null && addition != null) {
             final @Nullable NamespacedKey baseModel = base.getItemMeta().getItemModel();
             final @Nullable NamespacedKey additionModel = addition.getItemMeta().getItemModel();
-            // Returning if base item has no model specified or specified model is missing from configured list.
-            if (baseModel == null || PluginConfig.ENDERITE_SETTINGS_BASE_MODELS.contains(baseModel) == false)
-                return;
-            // Returning if addition item has a model specified but one that is not part of configured list. One exception is if models are the same, such as when repairing sword with other sword.
-            if (additionModel == null || PluginConfig.ENDERITE_SETTINGS_ADDITION_MODELS.contains(additionModel) == true || additionModel.equals(baseModel) == true)
-                return;
-            // Setting result to null as to prevent repairing / combining base item with invalid addition item.
-            event.setResult(null);
+            // Continuing only for items we need to handle.
+            if (baseModel != null && PluginConfig.ENDERITE_SETTINGS_BASE_MODELS.contains(baseModel) == true) {
+                // Cancelling if addition model is not set and configured list is not empty.
+                if (additionModel == null) {
+                    event.setResult(null);
+                    return;
+                }
+                // Cancelling repairing of base item with invalid addition item. Base item can also be repaired with the same tool type and quality.
+                if (PluginConfig.ENDERITE_SETTINGS_ADDITION_MODELS.contains(additionModel) == false && additionModel.equals(baseModel) == false) {
+                    event.setResult(null);
+                    return;
+                }
+                // Otherwise, allowing the anvil interaction...
+            }
         }
     }
 
