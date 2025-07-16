@@ -5,24 +5,23 @@ plugins {
     id("de.eldoria.plugin-yml.paper") version "0.7.1"
 }
 
+final String VERSION = "1.21.7"
+final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
+
 group = "cloud.grabsky"
-version = "1.21.5-${System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"}"
+version = "$VERSION-$RUN_NUMBER"
 
 repositories {
     mavenLocal()
     mavenCentral()
     // Repository containing the 'Paper API' dependency.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
-    // Repository containing the 'PacketEvents' and 'Item-NBT-API' dependencies.
+    // Repository containing the 'PacketEvents' dependency.
     maven { url = "https://repo.codemc.io/repository/maven-public" }
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
-    // Repository containing the 'bedrock' dependency.
-    maven { url = "https://maven.pkg.github.com/Grabsky/bedrock"; fillCredentials(it) }
-    // Repository containing the 'configuration' dependency.
-    maven { url = "https://maven.pkg.github.com/Grabsky/configuration"; fillCredentials(it) }
-    // Repository containing the 'commands' dependency.
-    maven { url = "https://maven.pkg.github.com/Grabsky/commands"; fillCredentials(it) }
+    // Repository containing all my libraries.
+    maven { url = "https://vela.grabsky.workers.dev/releases" }
 }
 
 dependencies {
@@ -30,27 +29,35 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     // Paper (Provided)
-    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
     // PacketEvents (Provided)
-    compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.9.1")
     // PlaceholderAPI (Provided)
     compileOnly("me.clip:placeholderapi:2.11.6")
     // Azure (Provided)
-    compileOnly("cloud.grabsky:azure-api:1.21.4-109") {
+    compileOnly("cloud.grabsky:azure-api:1.21.7-142") {
         exclude group: "cloud.grabsky", module: "bedrock"
     }
     // Dependencies (My Libraries) (Shaded)
-    implementation("cloud.grabsky:bedrock:1.21-64")
-    implementation("cloud.grabsky:commands:1.20.1-37")
-    implementation("cloud.grabsky:configuration-paper:1.21.4-51")
+    paperLibrary("cloud.grabsky:bedrock:1.21-67")
+    paperLibrary("cloud.grabsky:commands:1.20.1-40")
+    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-54")
     // Dependencies (Other Libraries) (Shaded)
-    implementation("com.jeff-media:MorePersistentDataTypes:2.4.0")
+    paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }
 
 tasks {
     runServer {
-        minecraftVersion("1.21.5")
+        minecraftVersion("1.21.7")
         jvmArgs("--enable-preview")
+        // Declaring plugin dependencies. These will be downloaded automatically.
+        downloadPlugins {
+            modrinth("packetevents", "2.9.1+spigot")
+            modrinth("luckperms", "v5.5.0-bukkit")
+            hangar("PlaceholderAPI", "2.11.6")
+            github("Grabsky", "Azure", "1.21.7+142", "Azure-1.21.7-142.jar")
+        }
+
     }
     shadowJar {
         shadowJar.archiveFileName = "${rootProject.name}-${project.version}.jar"
@@ -66,7 +73,9 @@ tasks {
 
 paper {
     main = "cloud.grabsky.tweaks.Tweaks"
-    apiVersion = "1.21.5"
+    loader = "cloud.grabsky.tweaks.Tweaks\$PluginLoader"
+    apiVersion = "1.21.7"
+    generateLibrariesJson = true
     serverDependencies {
         "Azure"          { load = "BEFORE"; required = true }
         "packetevents"   { load = "BEFORE"; required = true }
@@ -80,13 +89,3 @@ tasks.register("getRelease", () -> print("$VERSION #$RUN_NUMBER"))
 
 // Returns formatted tag name. (for GitHub Actions)
 tasks.register("getTag", () -> print("$VERSION+$RUN_NUMBER"))
-
-
-/* UTILITY METHODS */
-
-private final def fillCredentials(final MavenArtifactRepository repository) {
-    repository.credentials {
-        username = findProperty("gpr.actor") ?: System.getenv("GITHUB_ACTOR")
-        password = findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-    }
-}
