@@ -161,13 +161,6 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         // Loading PacketEvents.
         PacketEvents.getAPI().load();
     }
-
-    @Override
-    public void onDisable() {
-        // Terminating PacketEvents.
-        PacketEvents.getAPI().terminate();
-    }
-
     @Override
     public boolean onReload() throws ConfigurationMappingException, IllegalStateException {
         try {
@@ -181,7 +174,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
             this.modules.forEach(Module::reload);
             // Returning true, as everything seemed to reload properly.
             return true;
-        } catch (final IOException e) {
+        } catch (final ConfigurationMappingException | IOException e) {
             this.getLogger().severe("Reloading of the plugin failed due to following error(s):");
             this.getLogger().severe(" (1) " + e.getClass().getSimpleName() + ": " + e.getMessage());
             if (e.getCause() != null)
