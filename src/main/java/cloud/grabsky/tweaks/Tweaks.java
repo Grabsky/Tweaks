@@ -45,6 +45,7 @@ import cloud.grabsky.tweaks.handlers.ForeverYoungHandler;
 import cloud.grabsky.tweaks.handlers.ImprovedEndPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
+import cloud.grabsky.tweaks.handlers.ReasonableItemDespawnHandler;
 import cloud.grabsky.tweaks.handlers.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
@@ -139,6 +140,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
                 new ColoredNametagsHandler(this),
                 new BetterBoneMealHandler(this),
                 new ForeverYoungHandler(this),
+                new ReasonableItemDespawnHandler(this),
                 // Items
                 new ScrollItem(this),
                 new EnderiteItem(this)

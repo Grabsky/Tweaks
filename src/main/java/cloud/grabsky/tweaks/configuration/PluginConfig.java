@@ -133,6 +133,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.forever_young")
     public static boolean ENABLED_MODULES_FOREVER_YOUNG;
 
+    @JsonPath("enabled_modules.reasonable_item_despawn")
+    public static boolean ENABLED_MODULES_REASONABLE_ITEM_DESPAWN;
+
     // Enabled Modules > Items
 
     @JsonPath("enabled_modules.basket")
@@ -287,6 +290,11 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("forever_young_settings.age_unlock_item")
     public static ItemStack FOREVER_YOUNG_SETTINGS_AGE_UNLOCK_ITEM;
+
+    // Reasonable Item Despawn
+
+    @JsonPath("reasonable_item_despawn_settings.additional_ticks")
+    public static int REASONABLE_ITEM_DESPAWN_SETTINGS_ADDITIONAL_TICKS;
 
 
     // Moshi should be able to create instance of the object despite the constructor being private.

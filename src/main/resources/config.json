@@ -33,6 +33,7 @@
         "colored_nametags": false,
         "better_bone_meal": false,
         "forever_young": false,
+        "reasonable_item_despawn": false,
         // Items
         "basket": false,
         "scrolls": false,
@@ -293,5 +294,9 @@
         "age_unlock_item": {
             "material": "minecraft:golden_carrot"
         }
+    },
+    "reasonable_item_despawn_settings": {
+        // Additional ticks to wait until item can be despawned.
+        "additional_ticks": 24000
     }
 }
