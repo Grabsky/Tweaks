@@ -1,11 +1,11 @@
 plugins {
     id("java-library")
-    id("com.gradleup.shadow") version "8.3.5"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("de.eldoria.plugin-yml.paper") version "0.7.1"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("de.eldoria.plugin-yml.paper") version "0.8.0"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
 }
 
-final String VERSION = "1.21.7"
+final String VERSION = "1.21.10"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
@@ -17,7 +17,7 @@ repositories {
     // Repository containing the 'Paper API' dependency.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
     // Repository containing the 'PacketEvents' dependency.
-    maven { url = "https://repo.codemc.io/repository/maven-public" }
+    maven { url = "https://repo.codemc.io/repository/maven-snapshots" }
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     // Repository containing all my libraries.
@@ -26,16 +26,16 @@ repositories {
 
 dependencies {
     // Lombok
-    compileOnly("org.projectlombok:lombok:1.18.36")
-    annotationProcessor("org.projectlombok:lombok:1.18.36")
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
     // Paper (Provided)
-    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
     // PacketEvents (Provided)
-    compileOnly("com.github.retrooper:packetevents-spigot:2.9.1")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.10.0-SNAPSHOT")
     // PlaceholderAPI (Provided)
     compileOnly("me.clip:placeholderapi:2.11.6")
     // Azure (Provided)
-    compileOnly("cloud.grabsky:azure-api:1.21.7-142") {
+    compileOnly("cloud.grabsky:azure-api:1.21.8-159") {
         exclude group: "cloud.grabsky", module: "bedrock"
     }
     // Dependencies (My Libraries) (Shaded)
@@ -48,24 +48,21 @@ dependencies {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.7")
-        jvmArgs("--enable-preview")
+        minecraftVersion("1.21.10")
         // Declaring plugin dependencies. These will be downloaded automatically.
         downloadPlugins {
-            modrinth("packetevents", "2.9.1+spigot")
-            modrinth("luckperms", "v5.5.0-bukkit")
-            hangar("PlaceholderAPI", "2.11.6")
-            github("Grabsky", "Azure", "1.21.7+142", "Azure-1.21.7-142.jar")
+            modrinth("axiom-paper-plugin", "5.0.2+1.21.10")
+            modrinth("luckperms", "v5.5.17-bukkit")
+            modrinth("PlaceholderAPI", "2.11.6")
+            github("Grabsky", "Azure", "1.21.8+159", "Azure-1.21.8-159.jar")
+            url("https://ci.codemc.io/job/retrooper/job/packetevents/770/artifact/build/libs/packetevents-spigot-2.10.0-SNAPSHOT.jar")
         }
-
-    }
-    shadowJar {
-        shadowJar.archiveFileName = "${rootProject.name}-${project.version}.jar"
     }
     compileJava {
+        options.release = 21
         options.fork = true
         options.compilerArgs += "--enable-preview"
-        // Setting compatibility to Java 21 (above should work too).
+        // Setting compatibility to Java 21 and above.
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
@@ -74,7 +71,7 @@ tasks {
 paper {
     main = "cloud.grabsky.tweaks.Tweaks"
     loader = "cloud.grabsky.tweaks.Tweaks\$PluginLoader"
-    apiVersion = "1.21.7"
+    apiVersion = "1.21.10"
     generateLibrariesJson = true
     serverDependencies {
         "Azure"          { load = "BEFORE"; required = true }
@@ -83,6 +80,14 @@ paper {
     }
 }
 
+// Configuring runServer task to use JetBrains' JDK 21 for expanded hot-swap features.
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun.class).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        vendor = JvmVendorSpec.JETBRAINS
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-Dcom.mojang.eula.agree=true", "-Dnet.kyori.ansi.colorLevel=truecolor", "--enable-preview")
+}
 
 // Returns formatted release name. (for GitHub Actions)
 tasks.register("getRelease", () -> print("$VERSION #$RUN_NUMBER"))
