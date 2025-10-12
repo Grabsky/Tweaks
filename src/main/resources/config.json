@@ -297,6 +297,6 @@
     },
     "reasonable_item_despawn_settings": {
         // Additional ticks to wait until item can be despawned.
-        "additional_ticks": 24000
+        "additional_ticks": 30000
     }
 }
