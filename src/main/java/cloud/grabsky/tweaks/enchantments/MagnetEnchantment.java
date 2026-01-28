@@ -14,17 +14,6 @@
  */
 package cloud.grabsky.tweaks.enchantments;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import org.jetbrains.annotations.NotNull;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.ExtensionMethod;
-
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
@@ -61,6 +50,17 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.jetbrains.annotations.NotNull;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
 @SuppressWarnings("UnstableApiUsage")
@@ -114,6 +114,11 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.AMETHYST_SHARD)
             // Echo Shard has a small chance to drop when destroying Amethyst Cluster on our server.
             .add(Material.ECHO_SHARD)
+            // In case "Smelter" or similar enchantment is enabled.
+            .add(Material.COPPER_INGOT)
+            .add(Material.IRON_INGOT)
+            .add(Material.GOLD_INGOT)
+            .add(Material.NETHERITE_SCRAP)
             .lock();
 
     @Override

@@ -130,9 +130,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.better_bone_meal")
     public static boolean ENABLED_MODULES_BETTER_BONE_MEAL;
 
-    @JsonPath("enabled_modules.forever_young")
-    public static boolean ENABLED_MODULES_FOREVER_YOUNG;
-
     @JsonPath("enabled_modules.reasonable_item_despawn")
     public static boolean ENABLED_MODULES_REASONABLE_ITEM_DESPAWN;
 
@@ -282,14 +279,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("colored_nametags_settings.colors")
     public static Map<Material, String> COLORED_NAMETAGS_SETTINGS_COLORS;
-
-    // Forever Young Settings
-
-    @JsonPath("forever_young_settings.age_lock_item")
-    public static ItemStack FOREVER_YOUNG_SETTINGS_AGE_LOCK_ITEM;
-
-    @JsonPath("forever_young_settings.age_unlock_item")
-    public static ItemStack FOREVER_YOUNG_SETTINGS_AGE_UNLOCK_ITEM;
 
     // Reasonable Item Despawn
 

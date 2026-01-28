@@ -32,7 +32,6 @@
         "balanced_villager_restock": false,
         "colored_nametags": false,
         "better_bone_meal": false,
-        "forever_young": false,
         "reasonable_item_despawn": false,
         // Items
         "basket": false,
@@ -283,16 +282,6 @@
             "minecraft:green_dye": "#228B22",
             "minecraft:red_dye": "#DB1417",
             "minecraft:black_dye": "#1E1E1E"
-        }
-    },
-    "forever_young_settings": {
-        // Item used to lock age of the entity.
-        "age_lock_item": {
-            "material": "minecraft:glow_berries"
-        },
-        // Item used to unlock age of the entity.
-        "age_unlock_item": {
-            "material": "minecraft:golden_carrot"
         }
     },
     "reasonable_item_despawn_settings": {
