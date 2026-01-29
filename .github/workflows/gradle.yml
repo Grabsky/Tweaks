@@ -21,9 +21,9 @@ jobs:
       # Setup Gradle
       - name: Gradle
         uses: gradle/actions/setup-gradle@v4
-      # Build and Publish
+      # Build
       - name: Build
-        run: ./gradlew clean shadowJar --no-daemon
+        run: ./gradlew build --no-daemon
       # Expose Release & Tag
       - name: Expose Release & Tag
         run: |
@@ -44,5 +44,6 @@ jobs:
           # Configuring files that are attached to the release.
           files: "build/libs/Tweaks-*.jar"
           # Configuring release body.
-          append_body: true
+          generate_release_notes: true
           body: "Unless stated otherwise, this is NOT a stable release. You are advised AGAINST running it, even in a development environment."
+          append_body: true
