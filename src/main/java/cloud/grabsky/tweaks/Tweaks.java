@@ -14,7 +14,7 @@
  */
 package cloud.grabsky.tweaks;
 
-import cloud.grabsky.bedrock.BedrockPlugin;
+import cloud.grabsky.bedrock.BedrockScheduler;
 import cloud.grabsky.commands.RootCommandManager;
 import cloud.grabsky.configuration.ConfigurationHolder;
 import cloud.grabsky.configuration.ConfigurationMapper;
@@ -59,6 +59,7 @@ import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -81,10 +82,13 @@ import lombok.Getter;
 
 import static cloud.grabsky.configuration.paper.util.Resources.ensureResourceExistence;
 
-public final class Tweaks extends BedrockPlugin implements Listener {
+public final class Tweaks extends JavaPlugin implements Listener {
 
     @Getter(AccessLevel.PUBLIC)
     private static Tweaks instance;
+
+    @Getter(AccessLevel.PUBLIC)
+    private BedrockScheduler bedrockScheduler;
 
     private ConfigurationMapper mapper;
     private RootCommandManager commands;
@@ -95,9 +99,10 @@ public final class Tweaks extends BedrockPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        super.onEnable();
         // Updating the instance of the plugin.
         instance = this;
+        // Creating new instance of BedrockScheduler for this plugin.
+        bedrockScheduler = new BedrockScheduler(this);
         // Updating the main thread executor.
         MAIN_THREAD = Bukkit.getScheduler().getMainThreadExecutor(this);
         // Creating ConfigurationMapper instance.
@@ -160,7 +165,7 @@ public final class Tweaks extends BedrockPlugin implements Listener {
         // Loading PacketEvents.
         PacketEvents.getAPI().load();
     }
-    @Override
+
     public boolean onReload() throws ConfigurationMappingException, IllegalStateException {
         try {
             // Ensuring configuration file(s) exist.
