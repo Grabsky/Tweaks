@@ -1,11 +1,14 @@
 plugins {
     id("java-library")
+    // https://github.com/jpenilla/run-task
     id("xyz.jpenilla.run-paper") version "3.0.2"
+    // https://github.com/eldoriarpg/plugin-yml
     id("de.eldoria.plugin-yml.paper") version "0.8.0"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
+    // https://github.com/PaperMC/paperweight
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 
-final String VERSION = "1.21.10"
+final String VERSION = "1.21.11"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
@@ -17,61 +20,57 @@ repositories {
     // Repository containing the 'Paper API' dependency.
     maven { url = "https://repo.papermc.io/repository/maven-public/" }
     // Repository containing the 'PacketEvents' dependency.
-    maven { url = "https://repo.codemc.io/repository/maven-snapshots" }
+    maven { url = "https://repo.codemc.io/repository/maven-releases" }
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
     // Repository containing all my libraries.
-    maven { url = "https://vela.grabsky.workers.dev/releases" }
+    maven { url = "https://repo.repsy.io/grabsky/maven" }
 }
 
 dependencies {
-    // Lombok
+    // https://github.com/projectlombok/lombok
     compileOnly("org.projectlombok:lombok:1.18.42")
     annotationProcessor("org.projectlombok:lombok:1.18.42")
-    // Paper (Provided)
-    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
-    // PacketEvents (Provided)
-    compileOnly("com.github.retrooper:packetevents-spigot:2.10.0-SNAPSHOT")
-    // PlaceholderAPI (Provided)
-    compileOnly("me.clip:placeholderapi:2.11.6")
-    // Azure (Provided)
-    compileOnly("cloud.grabsky:azure-api:1.21.8-159") {
+    // https://github.com/PaperMC/Paper
+    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+    // https://github.com/retrooper/packetevents
+    compileOnly("com.github.retrooper:packetevents-spigot:2.11.2")
+    // https://github.com/PlaceholderAPI/PlaceholderAPI
+    compileOnly("me.clip:placeholderapi:2.12.2")
+    // https://github.com/Grabsky/Azure
+    compileOnly("cloud.grabsky:azure-api:1.21.11-169") {
         exclude group: "cloud.grabsky", module: "bedrock"
     }
-    // Dependencies (My Libraries) (Shaded)
-    paperLibrary("cloud.grabsky:bedrock:1.21-67")
-    paperLibrary("cloud.grabsky:commands:1.20.1-40")
-    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-54")
-    // Dependencies (Other Libraries) (Shaded)
+    // https://github.com/Grabsky/bedrock
+    paperLibrary("cloud.grabsky:bedrock:1.21.X-72")
+    // https://github.com/Grabsky/commands
+    paperLibrary("cloud.grabsky:commands:1.21.X-41")
+    // https://github.com/Grabsky/configuration
+    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-58")
+    // https://github.com/mfnalex/MorePersistentDataTypes
     paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }
 
-tasks {
-    runServer {
-        minecraftVersion("1.21.10")
-        // Declaring plugin dependencies. These will be downloaded automatically.
-        downloadPlugins {
-            modrinth("axiom-paper-plugin", "5.0.2+1.21.10")
-            modrinth("luckperms", "v5.5.17-bukkit")
-            modrinth("PlaceholderAPI", "2.11.6")
-            github("Grabsky", "Azure", "1.21.8+159", "Azure-1.21.8-159.jar")
-            url("https://ci.codemc.io/job/retrooper/job/packetevents/770/artifact/build/libs/packetevents-spigot-2.10.0-SNAPSHOT.jar")
-        }
+runServer {
+    minecraftVersion("1.21.11")
+    downloadPlugins {
+        modrinth("axiom-paper-plugin", "5.0.3+1.21.11")
+        modrinth("luckperms", "v5.5.17-bukkit")
+        modrinth("placeholderapi", "2.12.2")
+        modrinth("packetevents", "2.11.2+spigot")
+        github("Grabsky", "Azure", "1.21.11+171", "Azure-1.21.11-171.jar")
     }
-    compileJava {
-        options.release = 21
-        options.fork = true
-        options.compilerArgs += "--enable-preview"
-        // Setting compatibility to Java 21 and above.
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
+}
+
+compileJava {
+    options.fork = true
+    options.release = 25
 }
 
 paper {
     main = "cloud.grabsky.tweaks.Tweaks"
     loader = "cloud.grabsky.tweaks.Tweaks\$PluginLoader"
-    apiVersion = "1.21.10"
+    apiVersion = "1.21.11"
     generateLibrariesJson = true
     serverDependencies {
         "Azure"          { load = "BEFORE"; required = true }
@@ -80,13 +79,10 @@ paper {
     }
 }
 
-// Configuring runServer task to use JetBrains' JDK 21 for expanded hot-swap features.
+// Configuring runServer task to use JetBrains' JDK 25 for expanded hot-swap features.
 tasks.withType(xyz.jpenilla.runtask.task.AbstractRun.class).configureEach {
-    javaLauncher = javaToolchains.launcherFor {
-        vendor = JvmVendorSpec.JETBRAINS
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-Dcom.mojang.eula.agree=true", "-Dnet.kyori.ansi.colorLevel=truecolor", "--enable-preview")
+    javaLauncher = javaToolchains.launcherFor { vendor = JvmVendorSpec.JETBRAINS; languageVersion = JavaLanguageVersion.of(25) }
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition", "-Dcom.mojang.eula.agree=true", "-Dnet.kyori.ansi.colorLevel=truecolor")
 }
 
 // Returns formatted release name. (for GitHub Actions)

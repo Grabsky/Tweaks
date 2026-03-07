@@ -14,7 +14,7 @@
  */
 package cloud.grabsky.tweaks.configuration.object;
 
-import com.squareup.moshi.Json;
+import com.google.gson.annotations.SerializedName;
 import org.bukkit.Particle;
 
 import lombok.AccessLevel;
@@ -33,15 +33,15 @@ public final class Particles {
     @Getter(AccessLevel.PUBLIC)
     private final float speed;
 
-    @Json(name = "offset_x")
+    @SerializedName("offset_x")
     @Getter(AccessLevel.PUBLIC)
     private final double offsetX;
 
-    @Json(name = "offset_y")
+    @SerializedName("offset_y")
     @Getter(AccessLevel.PUBLIC)
     private final double offsetY;
 
-    @Json(name = "offset_z")
+    @SerializedName("offset_z")
     @Getter(AccessLevel.PUBLIC)
     private final double offsetZ;
 
