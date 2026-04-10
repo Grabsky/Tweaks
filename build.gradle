@@ -46,7 +46,7 @@ dependencies {
     // https://github.com/Grabsky/commands
     paperLibrary("cloud.grabsky:commands:1.21.X-41")
     // https://github.com/Grabsky/configuration
-    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-58")
+    paperLibrary("cloud.grabsky:configuration-paper:1.21.4-59")
     // https://github.com/mfnalex/MorePersistentDataTypes
     paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
 }
