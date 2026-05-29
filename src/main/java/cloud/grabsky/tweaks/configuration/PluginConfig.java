@@ -24,7 +24,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Map;
@@ -247,17 +246,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("teleportation_settings.lang.teleport_failure_on_cooldown")
     public static String TELEPORTATION_SETTINGS_LANG_TELEPORT_FAILURE_ON_COOLDOWN;
-
-    // Enderite Settings
-
-    @JsonPath("enderite_settings.base_models")
-    public static List<NamespacedKey> ENDERITE_SETTINGS_BASE_MODELS;
-
-    @JsonPath("enderite_settings.addition_models")
-    public static List<NamespacedKey> ENDERITE_SETTINGS_ADDITION_MODELS;
-
-    @JsonPath("enderite_settings.furnace_smelting_result")
-    public static ItemStack ENDERITE_SETTINGS_FURNACE_SMELTING_RESULT;
 
     // Wither Spawn Whitelist Settings
 

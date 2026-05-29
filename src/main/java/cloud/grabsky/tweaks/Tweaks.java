@@ -50,7 +50,6 @@ import cloud.grabsky.tweaks.handlers.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.handlers.WeakerPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.WitherSpawnWhitelistHandler;
 import cloud.grabsky.tweaks.items.BasketHandler;
-import cloud.grabsky.tweaks.items.EnderiteItem;
 import cloud.grabsky.tweaks.items.ScrollItem;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.google.gson.Gson;
@@ -124,8 +123,6 @@ public final class Tweaks extends JavaPlugin implements Listener {
                 new InvulnerableKeepInventoryHandler(this),
                 // Chairs
                 new ChairsHandler(this),
-                // Basket
-                new BasketHandler(this),
                 // Other
                 new WeakerPhantomsHandler(this),
                 new CreeperIgniterHandler(this),
@@ -144,8 +141,8 @@ public final class Tweaks extends JavaPlugin implements Listener {
                 new BetterBoneMealHandler(this),
                 new ReasonableItemDespawnHandler(this),
                 // Items
-                new ScrollItem(this),
-                new EnderiteItem(this)
+                new BasketHandler(this),
+                new ScrollItem(this)
         );
         // Reloading configuration and shutting the server down in case it fails.
         if (this.onReload() == false)
