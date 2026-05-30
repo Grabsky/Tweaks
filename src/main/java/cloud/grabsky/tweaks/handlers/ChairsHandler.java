@@ -97,20 +97,26 @@ public final class ChairsHandler implements Module, Listener {
                     return;
                 // Cancelling the event...
                 event.setCancelled(true);
-                // Spawning block display entity and adding player as a passenger.
-                block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
-                    it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
-                    it.setPersistent(false);
-                    // Getting direction of the stairs. Multiplying by -2 to to get the opposite.
-                    final Vector direction = stairs.getFacing().getDirection().multiply(-2);
-                    // Creating new location which player will be teleported to. Only difference would be in the direction itself.
-                    final Location location = event.getPlayer().getLocation().setDirection(direction);
-                    // "Teleporting" player to the new location, which effectively just sets direction the player is looking at.
-                    event.getPlayer().teleport(location);
-                    // Adding player as a passenger.
-                    it.addPassenger(event.getPlayer());
-                    // Swinging player's hand as to rotate their body.
-                    event.getPlayer().swingMainHand();
+                // Getting direction of the stairs. Multiplying by -2 to get the opposite.
+                final Vector direction = stairs.getFacing().getDirection().multiply(-2);
+                // Scheduling next tick - workaround for height limit action bar message.
+                plugin.getBedrockScheduler().run(1L, (_) -> {
+                    // Returning if occupied by another entity.
+                    if (block.getLocation().toCenterLocation().getNearbyEntitiesByType(BlockDisplay.class, 0.1, 0.1, 0.1).stream().findFirst().orElse(null) != null)
+                        return;
+                    // Spawning block display entity and adding player as a passenger.
+                    block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
+                        it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
+                        it.setPersistent(false);
+                        // Creating new location which player will be teleported to. Only difference would be in the direction itself.
+                        final Location location = event.getPlayer().getLocation().setDirection(direction);
+                        // "Teleporting" player to the new location, which effectively just sets direction the player is looking at.
+                        event.getPlayer().teleport(location);
+                        // Adding player as a passenger.
+                        it.addPassenger(event.getPlayer());
+                        // Swinging player's hand as to rotate their body.
+                        event.getPlayer().swingMainHand();
+                    });
                 });
             }
         }
@@ -141,7 +147,7 @@ public final class ChairsHandler implements Module, Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onBlockBreak(final @NotNull BlockBreakBlockEvent event) {
+    public void onBlockBreakBlock(final @NotNull BlockBreakBlockEvent event) {
         final Location center = event.getBlock().getLocation().toCenterLocation();
         event.getBlock().getWorld().getNearbyEntities(center, 0.1, 0.1, 0.1).forEach(it -> {
             if (it instanceof BlockDisplay display && display.getPersistentDataContainer().get(CHAIR_ENTITY, PersistentDataType.BYTE) != null && display.getPassengers().isEmpty() == false)
