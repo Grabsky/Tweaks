@@ -142,9 +142,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.scrolls")
     public static boolean ENABLED_MODULES_SCROLLS;
 
-    @JsonPath("enabled_modules.enderite")
-    public static boolean ENABLED_MODULES_ENDERITE;
-
     // Compass Settings
 
     @JsonPath("compass_settings.refresh_rate")
