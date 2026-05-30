@@ -21,6 +21,8 @@ import cloud.grabsky.tweaks.configuration.object.Particles;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.EntityType;
@@ -219,6 +221,9 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("teleportation_settings.delay")
     public static int TELEPORTATION_SETTINGS_DELAY;
 
+    @JsonPath("teleportation_settings.scroll_of_return_location")
+    public static LazyLocation TELEPORTATION_SETTINGS_SCROLL_OF_RETURN_LOCATION;
+
     @JsonPath("teleportation_settings.fade_in_fade_out_animation_translation")
     public static String TELEPORTATION_SETTINGS_FADE_IN_FADE_OUT_ANIMATION_TRANSLATION;
 
@@ -286,6 +291,34 @@ public final class PluginConfig implements JsonConfiguration {
 
         @Getter(AccessLevel.PUBLIC)
         private final String text;
+
+    }
+
+    // Moshi should be able to create instance of the object despite the constructor being private.
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class LazyLocation {
+
+        @Getter(AccessLevel.PUBLIC)
+        private final NamespacedKey world;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final double x;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final double y;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final double z;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final float yaw;
+
+        @Getter(AccessLevel.PUBLIC)
+        private final float pitch;
+
+        public Location toLocation() {
+            return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
+        }
 
     }
 

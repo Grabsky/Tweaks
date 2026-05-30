@@ -188,7 +188,7 @@ public final class ScrollItem implements Module, Listener, PacketListener {
                     // Getting the destination location.
                     final Location destination = (type.equals("scroll_of_recovery") == true && player.getLastDeathLocation() != null)
                             ? player.getLastDeathLocation()
-                            : AzureProvider.getAPI().getWorldManager().getSpawnPoint(AzureProvider.getAPI().getWorldManager().getPrimaryWorld());
+                            : PluginConfig.TELEPORTATION_SETTINGS_SCROLL_OF_RETURN_LOCATION.toLocation();
                     // Check if player is not on (initial) cooldown.
                     if (player.hasCooldown(item) == false) {
                         // Updating (initial; per-use) visual cooldown of all scroll items,

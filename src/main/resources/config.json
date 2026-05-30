@@ -195,6 +195,8 @@
     "teleportation_settings": {
         // Delay before player is teleported. (in seconds)
         "delay": 5,
+        // Location player will be teleported to upon using "Scroll of Return" item.
+        "scroll_of_return_location": { "world": "minecraft:overworld", "x": 0.5, "y": 62.0, "z": 0.5, "yaw": 0.0, "pitch": 0.0 },
         // Fade-in-fade-out animation translation key. Setting this to blank string will disable the animation.
         "fade_in_fade_out_animation_translation": "ui.util.black_screen",
         // Sounds that are played to nearby players upon teleportation.
