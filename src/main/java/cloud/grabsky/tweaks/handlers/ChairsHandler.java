@@ -39,6 +39,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDismountEvent;
+import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -120,6 +121,16 @@ public final class ChairsHandler implements Module, Listener {
                 });
             }
         }
+    }
+
+    // WorldGuard cancels 'EntityMountEvent' for non-members in protected regions, unless 'ride' flag is set to allow.
+    // This handler uncancels it, so players can sit on stairs located in all regions.
+    // This is easier than canceling sitting altogether as we don't know if event will be canceled until Entity#addPassenger is called.
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEnterBypassWorldGuardProtection(final EntityMountEvent event) {
+        if (event.getMount() instanceof BlockDisplay display && display.getPersistentDataContainer().get(CHAIR_ENTITY, PersistentDataType.BYTE) != null)
+            if (event.isCancelled() == true)
+                event.setCancelled(false);
     }
 
     @EventHandler(ignoreCancelled = true)
