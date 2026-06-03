@@ -39,8 +39,6 @@ import cloud.grabsky.tweaks.handlers.ColoredNametagsHandler;
 import cloud.grabsky.tweaks.handlers.CompassHandler;
 import cloud.grabsky.tweaks.handlers.CreeperIgniterHandler;
 import cloud.grabsky.tweaks.handlers.DamageMultipliersHandler;
-import cloud.grabsky.tweaks.handlers.DimensionSoftLockHandler;
-import cloud.grabsky.tweaks.handlers.EnderPortalFrameHandler;
 import cloud.grabsky.tweaks.handlers.ImprovedEndPhantomsHandler;
 import cloud.grabsky.tweaks.handlers.InvulnerableKeepInventoryHandler;
 import cloud.grabsky.tweaks.handlers.MapHandler;
@@ -127,7 +125,6 @@ public final class Tweaks extends JavaPlugin implements Listener {
                 new WeakerPhantomsHandler(this),
                 new CreeperIgniterHandler(this),
                 new CampfireHandler(this),
-                new EnderPortalFrameHandler(this),
                 new ArmorStandHandler(this),
                 new SkullDataRecoveryHandler(this),
                 new ReusableVaultsHandler(this),
@@ -135,7 +132,6 @@ public final class Tweaks extends JavaPlugin implements Listener {
                 new BreakingMultipliersHandler(this),
                 new ImprovedEndPhantomsHandler(this),
                 new WitherSpawnWhitelistHandler(this),
-                new DimensionSoftLockHandler(this),
                 new BalancedVillagerRestockHandler(this),
                 new ColoredNametagsHandler(this),
                 new BetterBoneMealHandler(this),

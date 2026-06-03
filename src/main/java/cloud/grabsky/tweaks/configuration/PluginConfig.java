@@ -95,9 +95,6 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("enabled_modules.campfire_prevents_mob_tracking")
     public static boolean ENABLED_MODULES_CAMPFIRE_PREVENTS_MOB_TRACKING;
 
-    @JsonPath("enabled_modules.ender_portal_frame_mini_game")
-    public static boolean ENABLED_MODULES_ENDER_PORTAL_FRAME_MINI_GAME;
-
     @JsonPath("enabled_modules.armor_stand_spawns_with_arms")
     public static boolean ENABLED_MODULES_ARMOR_STAND_SPAWNS_WITH_ARMS;
 
@@ -118,9 +115,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("enabled_modules.wither_spawn_whitelist")
     public static boolean ENABLED_MODULES_WITHER_SPAWN_WHITELIST;
-
-    @JsonPath("enabled_modules.dimension_soft_lock")
-    public static boolean ENABLED_MODULES_DIMENSION_SOFT_LOCK;
 
     @JsonPath("enabled_modules.balanced_villager_restock")
     public static boolean ENABLED_MODULES_BALANCED_VILLAGER_RESTOCK;
@@ -253,17 +247,6 @@ public final class PluginConfig implements JsonConfiguration {
 
     @JsonPath("wither_spawn_whitelist_settings.enable_spawn_in_worlds")
     public static List<NamespacedKey> WITHER_SPAWN_WHITELIST_SETTINGS_ENABLE_SPAWN_IN_WORLDS;
-
-    // Dimension Soft Lock Settings
-
-    @JsonPath("dimension_soft_lock_settings.dimensions")
-    public static Map<NamespacedKey, Long> DIMENSION_SOFT_LOCK_SETTINGS_DIMENSIONS;
-
-    @JsonPath("dimension_soft_lock_settings.error_messages")
-    public static Map<NamespacedKey, String> DIMENSION_SOFT_LOCK_SETTINGS_ERROR_MESSAGES;
-
-    @JsonPath("dimension_soft_lock_settings.error_sounds")
-    public static Map<NamespacedKey, Sound> DIMENSION_SOFT_LOCK_SETTINGS_ERROR_SOUNDS;
 
     // Colored Nametags Settings
 
