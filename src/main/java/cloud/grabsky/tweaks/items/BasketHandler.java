@@ -103,6 +103,9 @@ public final class BasketHandler implements Module, Listener {
             if (event.getPlayer().getInventory().getItemInMainHand().getPersistentDataContainer().has(DATA_KEY) == true) {
                 // Cancelling the event because otherwise player would be able to eg. spawn baby variants of entities, which is not supported.
                 event.setCancelled(true);
+                // Returning if player is in adventure game mode.
+                if (event.getPlayer().getGameMode() == GameMode.ADVENTURE)
+                    return;
                 // Checking if player has EMPTY basket in their hand.
                 if (event.getPlayer().getInventory().getItemInMainHand().getPersistentDataContainer().has(DATA_KEY, PersistentDataType.BOOLEAN) == true) {
                     // Getting key of EntityType associated with this event.
@@ -179,6 +182,9 @@ public final class BasketHandler implements Module, Listener {
                     return;
                 // Cancelling the event.
                 event.setCancelled(true);
+                // Returning if player is in adventure game mode.
+                if (event.getPlayer().getGameMode() == GameMode.ADVENTURE)
+                    return;
                 // Removing item from player's hand.
                 if (event.getPlayer().getGameMode() == GameMode.SURVIVAL)
                     event.getPlayer().getInventory().getItemInMainHand().setAmount(event.getItem().getAmount() - 1);
