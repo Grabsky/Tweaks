@@ -54,6 +54,10 @@
         "bossbar": { "overlay": "PROGRESS", "color": "YELLOW", "text": "<biome>" }
     },
     "basket_settings": {
+        // Whether mobs with non-empty inventory should be denied.
+        "inventory_check": true,
+        // Message to be sent when inventory check fails and mob pickup is denied.
+        "inventory_check_message": "<dark_gray>› <red>Opróżnij ekwipunek moba zanim go włożysz do koszyka.",
         // Sounds to be played when entity is picked up from the ground.
         "pickup_sounds": [
             { "key": "minecraft:item.bundle.insert", "source": "master", "volume": 1.0, "pitch": 1.0 },

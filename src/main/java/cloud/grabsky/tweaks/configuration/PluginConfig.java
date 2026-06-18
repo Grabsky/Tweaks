@@ -181,6 +181,12 @@ public final class PluginConfig implements JsonConfiguration {
     @JsonPath("basket_settings.allowed_mobs")
     public static List<NamespacedKey> BASKET_SETTINGS_ALLOWED_MOBS;
 
+    @JsonPath("basket_settings.inventory_check")
+    public static boolean BASKET_SETTINGS_INVENTORY_CHECK;
+
+    @JsonPath("basket_settings.inventory_check_message")
+    public static Component BASKET_SETTINGS_INVENTORY_CHECK_MESSAGE;
+
     @JsonNullable @JsonPath("basket_settings.pickup_sounds")
     public static @Nullable List<Sound> BASKET_SETTINGS_PICKUP_SOUNDS;
 

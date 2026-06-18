@@ -15,6 +15,7 @@
 package cloud.grabsky.tweaks.items;
 
 import cloud.grabsky.bedrock.components.ComponentBuilder;
+import cloud.grabsky.bedrock.components.Message;
 import cloud.grabsky.bedrock.helpers.Conditions;
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
@@ -35,6 +36,7 @@ import org.bukkit.entity.Cat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.Frog;
 import org.bukkit.entity.Horse;
@@ -48,6 +50,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -59,12 +62,15 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -112,6 +118,18 @@ public final class BasketHandler implements Module, Listener {
                     final NamespacedKey key = entity.getType().getKey();
                     // Checking if clicked entity is allowed to be picked up.
                     if (PluginConfig.BASKET_SETTINGS_ALLOWED_MOBS.contains(key) == true) {
+                        // Checking mob inventory if enabled in config.
+                        if (PluginConfig.BASKET_SETTINGS_INVENTORY_CHECK == true && entity instanceof InventoryHolder holder) {
+                            // Villagers are excluded – their inventory cannot be easily modified by players.
+                            if (entity.getType() != EntityType.VILLAGER && entity.getType() != EntityType.ZOMBIE_VILLAGER) {
+                                // Any non-null item is found in storage slots – sending error message and skipping further logic.
+                                if (Arrays.stream(holder.getInventory().getStorageContents()).anyMatch(Objects::nonNull) == true) {
+                                    // Sending failure message and returning.
+                                    Message.of(PluginConfig.BASKET_SETTINGS_INVENTORY_CHECK_MESSAGE).send(event.getPlayer());
+                                    return;
+                                }
+                            }
+                        }
                         // Serializing entity to bytes.
                         final byte[] data = Bukkit.getUnsafe().serializeEntity(entity);
                         // "Generating" item key based on context. Hopefully this is valid for all entity types.
@@ -168,8 +186,14 @@ public final class BasketHandler implements Module, Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(final @NotNull PlayerInteractEvent event) {
+        // Skipping in non-authorized regions.
+        if (event.useInteractedBlock() == Event.Result.DENY || event.useItemInHand() == Event.Result.DENY)
+            return;
+        // Skipping left-click actions.
+        if (event.getAction().isLeftClick() == true)
+            return;
         if (event.getHand() == EquipmentSlot.HAND) {
             if (event.getItem() != null && event.getItem().getPersistentDataContainer().has(DATA_KEY, PersistentDataType.BYTE_ARRAY) == true) {
                 // Returning if player clicked on an interactable block.
