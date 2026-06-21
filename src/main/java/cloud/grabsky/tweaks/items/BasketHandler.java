@@ -50,6 +50,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -225,6 +226,11 @@ public final class BasketHandler implements Module, Listener {
                 // Overriding turtle's home location. Doing this will prevent them from going home to lay eggs.
                 if (entity instanceof Turtle turtle)
                     turtle.setHome(spawnLocation.toBlockLocation());
+                // Overriding villager's bed and workstation.
+                if (entity instanceof Villager villager) {
+                    villager.setMemory(MemoryKey.HOME, null);
+                    villager.setMemory(MemoryKey.JOB_SITE, null);
+                }
                 // Spawning the entity.
                 entity.spawnAt(spawnLocation, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
                 // Spawning particles.
