@@ -25,6 +25,7 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.world.Location;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBundle;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCollectItem;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
@@ -70,6 +71,14 @@ public final class MagnetEnchantment implements Module, Listener {
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
+    private static final MaterialSetTag SUPPORTED_MULTI_BLOCK_CROPS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_multi_block_crops"))
+            .add(Material.SUGAR_CANE)
+            .add(Material.BAMBOO)
+            .add(Material.CACTUS)
+            .add(Material.KELP)
+            .add(Material.KELP_PLANT)
+            .lock();
+
     // Holds all blocks and drops supported by the HOE handler for the MAGNET enchantment.
     private static final MaterialSetTag SUPPORTED_CROPS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_crops"))
             .add(Material.WHEAT)
@@ -78,6 +87,7 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.CARROTS)
             .add(Material.POTATO)
             .add(Material.POTATOES)
+            .add(Material.POISONOUS_POTATO)
             .add(Material.BEETROOT)
             .add(Material.BEETROOTS)
             .add(Material.BEETROOT_SEEDS)
@@ -91,10 +101,10 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.PUMPKIN)
             .add(Material.PUMPKIN_STEM)
             .add(Material.PUMPKIN_SEEDS)
+            .add(Material.HAY_BLOCK)
+            .add(Material.DRIED_KELP_BLOCK)
             // Experimental
-            .add(Material.SUGAR_CANE)
-            .add(Material.BAMBOO)
-            .add(Material.CACTUS)
+            .add(SUPPORTED_MULTI_BLOCK_CROPS)
             .lock();
 
     // Holds all blocks and drops supported by the PICKAXE handler for the MAGNET enchantment.
@@ -113,7 +123,7 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.AMETHYST_CLUSTER)
             .add(Material.AMETHYST_SHARD)
             // Echo Shard has a small chance to drop when destroying Amethyst Cluster on our server.
-            .add(Material.ECHO_SHARD)
+            // .add(Material.ECHO_SHARD)
             // In case "Smelter" or similar enchantment is enabled.
             .add(Material.COPPER_INGOT)
             .add(Material.IRON_INGOT)
@@ -143,15 +153,15 @@ public final class MagnetEnchantment implements Module, Listener {
             // Checking if player's tool is enchanted with Magnet enchantment.
             if (tool.isEnchantedWith("firedot:magnet") == true) {
                 final Block block = event.getBlock();
-                // Returning if pickaxe enchanted with magnet destroyed non-ore block.
-                if (MaterialTags.PICKAXES.isTagged(tool) == true && SUPPORTED_MINERALS.isTagged(block) == false)
+                // Returning if pickaxe enchanted with magnet, destroyed a non-ore block.
+                if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_MINERALS.isTagged(block) == false)
                     return;
-                // Returning if hoe enchanted with magnet destroyed non-crop block.
-                if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(block) == false)
+                // Returning if hoe enchanted with magnet, destroyed a non-crop block.
+                if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_CROPS.isTagged(block) == false)
                     return;
                 // Getting the experience player would get from destroying this block.
                 final int experience = event.getExpToDrop();
-                // Disabling vanilla drop of experience, will be added to the player in the next step.
+                // Disabling vanilla drop of experience will be added to the player in the next step.
                 event.setExpToDrop(0);
                 // Dropping experience directly at the player's location to make them pick it up instantly.
                 if (experience != 0) player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
@@ -171,43 +181,33 @@ public final class MagnetEnchantment implements Module, Listener {
             if (tool.isEnchantedWith("firedot:magnet") == true) {
                 // Getting the BlockState associated with the event.
                 final BlockState blockState = event.getBlockState();
-                // Returning if pickaxe enchanted with magnet destroyed non-ore block.
-                if (MaterialTags.PICKAXES.isTagged(tool) == true && SUPPORTED_MINERALS.isTagged(blockState) == false)
+                // Returning if pickaxe enchanted with magnet, destroyed a non-ore block.
+                if (MaterialSetTag.ITEMS_PICKAXES.isTagged(tool.getType()) == true && SUPPORTED_MINERALS.isTagged(blockState) == false)
                     return;
-                // Returning if hoe enchanted with magnet destroyed non-crop block.
-                if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(blockState) == false)
+                // Returning if hoe enchanted with magnet, destroyed a non-crop block.
+                if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_CROPS.isTagged(blockState) == false)
                     return;
                 // ...
-                if (blockState.getType() == Material.SUGAR_CANE || blockState.getType() == Material.BAMBOO || blockState.getType() == Material.CACTUS) {
+                if (SUPPORTED_MULTI_BLOCK_CROPS.isTagged(blockState) == true) {
                     // Iterating over blocks above the broken block.
                     Block relative = blockState.getWorld().getBlockAt(blockState.getX(), blockState.getY() + 1, blockState.getZ());
                     // ...
-                    while (relative.getType() == blockState.getType()) {
+                    while (relative.getType() == blockState.getType() || (relative.getType() == Material.KELP && blockState.getType() == Material.KELP_PLANT)) {
                         // Iterating over drops and adding them to the player's inventory.
                         relative.getDrops(tool, player).forEach(item -> {
                             // Adding drops directly to the player's inventory.
                             player.getInventory().addItem(item);
-                            // Creating next entity identifier for use with packets.
-                            final int id = Bukkit.getUnsafe().nextEntityId();
                             // Scheduling packet stuff asynchronously.
                             plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                                 final Location location = new Location(event.getBlockState().getX() + 0.5D, event.getBlockState().getY() + 0.5D, event.getBlockState().getZ() + 0.5D, 0F, 0F);
-                                // Creating PlayServerSpawnEntity packet.
-                                final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
-                                // Creating PlayServerEntityMetadata packet.
-                                final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(item))));
-                                // Creating PlayServerCollectItem packet.
-                                final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), item.getAmount());
                                 // Sending packets...
-                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
-                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
-                                PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+                                sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item);
                             });
                         });
                         // Playing the block break effect.
                         relative.getWorld().playEffect(relative.getLocation(), Effect.STEP_SOUND, relative.getBlockData());
                         // Removing the block from the world.
-                        relative.setType(Material.AIR);
+                        relative.setType(relative.getType() == Material.KELP || relative.getType() == Material.KELP_PLANT ? Material.WATER : Material.AIR);
                         // Updating the relative block.
                         relative = relative.getRelative(BlockFace.UP);
                     }
@@ -215,30 +215,20 @@ public final class MagnetEnchantment implements Module, Listener {
                 // Removing items...
                 event.getItems().removeIf(item -> {
                     // Skipping items that are not supported by the pickaxe.
-                    if (MaterialTags.PICKAXES.isTagged(tool) == true && SUPPORTED_MINERALS.isTagged(item.getItemStack()) == false)
+                    if (MaterialSetTag.ITEMS_PICKAXES.isTagged(tool.getType()) == true && SUPPORTED_MINERALS.isTagged(item.getItemStack()) == false)
                         return false;
                     // Skipping items that are not supported by the hoe.
-                    if (MaterialTags.HOES.isTagged(tool) == true && SUPPORTED_CROPS.isTagged(item.getItemStack()) == false)
+                    if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_CROPS.isTagged(item.getItemStack()) == false)
                         return false;
                     // Checking if player has space for an item.
                     if (player.getInventory().hasSpace(item.getItemStack()) == true) {
                         // Adding drops directly to the player's inventory.
                         player.getInventory().addItem(item.getItemStack());
-                        // Creating next entity identifier for use with packets.
-                        final int id = Bukkit.getUnsafe().nextEntityId();
                         // Scheduling packet stuff asynchronously.
                         plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                             final Location location = new Location(event.getBlockState().getX() + 0.5D, event.getBlockState().getY() + 0.5D, event.getBlockState().getZ() + 0.5D, 0F, 0F);
-                            // Creating PlayServerSpawnEntity packet.
-                            final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
-                            // Creating PlayServerEntityMetadata packet.
-                            final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(item.getItemStack()))));
-                            // Creating PlayServerCollectItem packet.
-                            final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), item.getItemStack().getAmount());
                             // Sending packets...
-                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
-                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
-                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+                            sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item.getItemStack());
                         });
                         // Returning true, which will cause the item to be removed from the list.
                         return true;
@@ -260,14 +250,14 @@ public final class MagnetEnchantment implements Module, Listener {
             final ItemStack tool = player.getInventory().getItemInMainHand();
             // Checking if player's tool is enchanted with Magnet enchantment.
             if (tool.isEnchantedWith("firedot:magnet") == true) {
-                if (MaterialTags.SWORDS.isTagged(tool) == false && tool.getType().asItemType() != ItemType.BOW && tool.getType().asItemType() != ItemType.CROSSBOW)
+                if (MaterialSetTag.ITEMS_ENCHANTABLE_SHARP_WEAPON.isTagged(tool.getType()) == false && tool.getType().asItemType() != ItemType.BOW && tool.getType().asItemType() != ItemType.CROSSBOW)
                     return;
                 // Returning for distances greater than 24 blocks. (Bow / Crossbow) (24x24 = 576)
                 if (player.getLocation().distanceSquared(event.getEntity().getLocation()) > 576)
                     return;
                 // Getting the experience player would get from destroying this block.
                 final int experience = event.getDroppedExp();
-                // Disabling vanilla drop of experience, will be added to the player in the next step.
+                // Disabling vanilla drop of experience will be added to the player in the next step.
                 event.setDroppedExp(0);
                 // Dropping experience directly at the player's location to make them pick it up instantly.
                 if (experience != 0)
@@ -283,26 +273,31 @@ public final class MagnetEnchantment implements Module, Listener {
                         event.getDrops().remove(drop);
                         // Adding drops directly to the player's inventory.
                         player.getInventory().addItem(drop);
-                        // Creating next entity identifier for use with packets.
-                        final int id = Bukkit.getUnsafe().nextEntityId();
                         // Scheduling packet stuff asynchronously.
                         plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                             final Location location = new Location(mob.getLocation().getX() + 0.5D, mob.getLocation().getY() + 0.5D, mob.getLocation().getZ() + 0.5D, 0F, 0F);
-                            // Creating PlayServerSpawnEntity packet.
-                            final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
-                            // Creating PlayServerEntityMetadata packet.
-                            final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(drop))));
-                            // Creating PlayServerCollectItem packet.
-                            final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), drop.getAmount());
                             // Sending packets...
-                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
-                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
-                            PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+                            sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, drop);
                         });
                     }
                 });
             }
         }
+    }
+
+    private void sendPackets(final int id, final @NotNull Player player, final @NotNull Location location, final @NotNull ItemStack item) {
+        // Creating PlayServerSpawnEntity packet.
+        final var PlayServerSpawnEntityPacket = new WrapperPlayServerSpawnEntity(id, UUID.randomUUID(), EntityTypes.ITEM, location, 0, 0, null);
+        // Creating PlayServerEntityMetadata packet.
+        final var PlayServerEntityMetadataPacket = new WrapperPlayServerEntityMetadata(id, List.of(new EntityData(8, EntityDataTypes.ITEMSTACK, SpigotConversionUtil.fromBukkitItemStack(item))));
+        // Creating PlayServerCollectItem packet.
+        final var PlayServerCollectItemPacket = new WrapperPlayServerCollectItem(id, player.getEntityId(), item.getAmount());
+        // Sending packets...
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerBundle());
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerSpawnEntityPacket);
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerEntityMetadataPacket);
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, PlayServerCollectItemPacket);
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerBundle());
     }
 
 }
