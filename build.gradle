@@ -52,13 +52,18 @@ dependencies {
 }
 
 runServer {
-    minecraftVersion("1.21.11")
+    minecraftVersion("26.1.2")
     downloadPlugins {
-        modrinth("axiom-paper-plugin", "5.0.3+1.21.11")
+        // https://modrinth.com/plugin/axiom-paper-plugin/versions
+        // modrinth("axiom-paper-plugin", "5.0.4+1.21.11")
+        // https://modrinth.com/plugin/luckperms/versions
         modrinth("luckperms", "v5.5.17-bukkit")
+        // https://modrinth.com/plugin/placeholderapi/versions
         modrinth("placeholderapi", "2.12.2")
-        modrinth("packetevents", "2.12.1+spigot")
-        github("Grabsky", "Azure", "1.21.11+171", "Azure-1.21.11-171.jar")
+        // https://modrinth.com/plugin/packetevents/versions
+        modrinth("packetevents", "2.13.0+spigot")
+        // https://modrinth.com/plugin/viaversion/versions
+        modrinth("viaversion", "5.10.0")
     }
 }
 
