@@ -21,6 +21,7 @@ import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -28,7 +29,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Crafter;
 import org.bukkit.entity.Axolotl;
@@ -134,9 +134,11 @@ public final class BasketHandler implements Module, Listener {
                         // Serializing entity to bytes.
                         final byte[] data = Bukkit.getUnsafe().serializeEntity(entity);
                         // "Generating" item key based on context. Hopefully this is valid for all entity types.
-                        final NamespacedKey itemKey = NamespacedKey.minecraft(entity.getType().getKey().value() + "_spawn_egg");
+                        final NamespacedKey model = NamespacedKey.minecraft(entity.getType().getKey().value() + "_spawn_egg");
                         // Getting material from the item key.
-                        final ItemStack item = ItemStack.of(Registry.MATERIAL.get(itemKey), 1);
+                        final ItemStack item = ItemStack.of(Material.TURTLE_SCUTE);
+                        // Setting the model.
+                        item.setData(DataComponentTypes.ITEM_MODEL, model);
                         // Modifying item.
                         item.editMeta(meta -> {
                             // Baskets should have maximum stack size of 1.
@@ -158,6 +160,8 @@ public final class BasketHandler implements Module, Listener {
                         final Location location = entity.getLocation().add(0.0F, entity.getHeight() / 2.0F, 0.0F);
                         // Removing entity from the world.
                         entity.remove();
+                        // Swinging hand.
+                        event.getPlayer().swingMainHand();
                         // Spawning particles.
                         if (PluginConfig.BASKET_SETTINGS_PICKUP_PARTICLES != null) {
                             PluginConfig.BASKET_SETTINGS_PICKUP_PARTICLES.forEach(it -> {
@@ -233,6 +237,8 @@ public final class BasketHandler implements Module, Listener {
                 }
                 // Spawning the entity.
                 entity.spawnAt(spawnLocation, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
+                // Swinging hand.
+                event.getPlayer().swingMainHand();
                 // Spawning particles.
                 if (PluginConfig.BASKET_SETTINGS_PLACE_PARTICLES != null) {
                     PluginConfig.BASKET_SETTINGS_PLACE_PARTICLES.forEach(it -> {
@@ -249,7 +255,7 @@ public final class BasketHandler implements Module, Listener {
         }
     }
 
-    // BLOCKING BASKETS FROM BEING USED BY DISPENSERS
+    // BLOCKING BASKETS FROM BEING USED BY DISPENSERS; LEGACY SPAWN EGG ITEMS
     @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(final BlockDispenseEvent event) {
         if (event.getItem().hasItemMeta() == true && event.getItem().getItemMeta() instanceof SpawnEggMeta meta)
