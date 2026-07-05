@@ -47,6 +47,7 @@ import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Sittable;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
@@ -235,6 +236,13 @@ public final class BasketHandler implements Module, Listener {
                     villager.setMemory(MemoryKey.HOME, null);
                     villager.setMemory(MemoryKey.JOB_SITE, null);
                 }
+                // Overriding poses so certain mobs are not frozen after placement.
+                if (entity instanceof Sittable sittable)
+                    sittable.setSitting(false);
+                if (entity instanceof Fox fox)
+                    fox.setSleeping(false);
+                if (entity instanceof Cat cat)
+                    cat.setLyingDown(false);
                 // Spawning the entity.
                 entity.spawnAt(spawnLocation, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
                 // Swinging hand.
