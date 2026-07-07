@@ -22,6 +22,8 @@ import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.ItemLore;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -83,6 +85,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
+@SuppressWarnings("UnstableApiUsage") // Item Component API
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class BasketHandler implements Module, Listener {
 
@@ -138,25 +141,24 @@ public final class BasketHandler implements Module, Listener {
                         final NamespacedKey model = NamespacedKey.minecraft(entity.getType().getKey().value() + "_spawn_egg");
                         // Getting material from the item key.
                         final ItemStack item = ItemStack.of(Material.TURTLE_SCUTE);
+                        // Setting the item name.
+                        item.setData(DataComponentTypes.ITEM_NAME, Component.translatable("item.minecraft." + entity.getType().getKey().value() + "_spawn_egg"));
+                        // Setting additional lore if specified.
+                        if (PluginConfig.BASKET_SETTINGS_APPLY_ADDITIONAL_LORE) {
+                            final @Nullable List<String> additionalLore = getAdditionalLore(entity);
+                            // If available, applying additional information to the item lore.
+                            if (additionalLore != null && additionalLore.isEmpty() == false)
+                                item.setData(DataComponentTypes.LORE, ItemLore.lore(additionalLore.stream().map(str -> ComponentBuilder.EMPTY_NO_ITALIC.append(MiniMessage.miniMessage().deserialize(str))).toList()));
+                        }
+                        // Setting enchantment glint override if specified.
+                        if (PluginConfig.BASKET_SETTINGS_APPLY_ENCHANTMENT_GLINT)
+                            item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
                         // Setting the model.
                         item.setData(DataComponentTypes.ITEM_MODEL, model);
-                        // Modifying item.
-                        item.editMeta(meta -> {
-                            // Baskets should have maximum stack size of 1.
-                            meta.setMaxStackSize(1);
-                            // Applying entity data to the PDC.
-                            meta.getPersistentDataContainer().set(DATA_KEY, PersistentDataType.BYTE_ARRAY, data);
-                            // Applying enchantment glint if specified.
-                            if (PluginConfig.BASKET_SETTINGS_APPLY_ENCHANTMENT_GLINT)
-                                meta.setEnchantmentGlintOverride(true);
-                            // Applying additional lore if specified.
-                            if (PluginConfig.BASKET_SETTINGS_APPLY_ADDITIONAL_LORE) {
-                                final @Nullable List<String> additionalLore = getAdditionalLore(entity);
-                                // If available, applying additional information to the item lore.
-                                if (additionalLore != null && additionalLore.isEmpty() == false)
-                                    meta.lore(additionalLore.stream().map(str -> ComponentBuilder.EMPTY_NO_ITALIC.append(MiniMessage.miniMessage().deserialize(str))).toList());
-                            }
-                        });
+                        // Baskets should have maximum stack size of 1.
+                        item.setData(DataComponentTypes.MAX_STACK_SIZE, 1);
+                        // Applying entity data to the PDC.
+                        item.editPersistentDataContainer(it -> it.set(DATA_KEY, PersistentDataType.BYTE_ARRAY, data));
                         // Getting location of the entity. Might be used in a later step.
                         final Location location = entity.getLocation().add(0.0F, entity.getHeight() / 2.0F, 0.0F);
                         // Removing entity from the world.
