@@ -50,6 +50,7 @@ import org.bukkit.entity.Pig;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Sittable;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Turtle;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
@@ -245,6 +246,8 @@ public final class BasketHandler implements Module, Listener {
                     fox.setSleeping(false);
                 if (entity instanceof Cat cat)
                     cat.setLyingDown(false);
+                if (entity instanceof Tameable tameable)
+                    tameable.setOwner(event.getPlayer());
                 // Spawning the entity.
                 entity.spawnAt(spawnLocation, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
                 // Swinging hand.
