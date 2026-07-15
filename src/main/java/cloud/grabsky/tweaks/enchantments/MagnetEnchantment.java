@@ -39,6 +39,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,9 +51,8 @@ import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ItemType;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,15 +63,16 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 
+import static io.github.retrooper.packetevents.util.SpigotConversionUtil.fromBukkitLocation;
+
 @ExtensionMethod(Extensions.class)
-@SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public final class MagnetEnchantment implements Module, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
-    private static final MaterialSetTag SUPPORTED_MULTI_BLOCK_CROPS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_multi_block_crops"))
+    private static final MaterialSetTag ALLOWED_FOR_HOE_MULTIBLOCK = new MaterialSetTag(new NamespacedKey("tweaks", "magnet/allowed_for_hoe/multiblock"))
             .add(Material.SUGAR_CANE)
             .add(Material.BAMBOO)
             .add(Material.CACTUS)
@@ -80,39 +81,40 @@ public final class MagnetEnchantment implements Module, Listener {
             .lock();
 
     // Holds all blocks and drops supported by the HOE handler for the MAGNET enchantment.
-    private static final MaterialSetTag SUPPORTED_CROPS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_crops"))
-            .add(Material.WHEAT)
-            .add(Material.WHEAT_SEEDS)
-            .add(Material.CARROT)
-            .add(Material.CARROTS)
-            .add(Material.POTATO)
-            .add(Material.POTATOES)
-            .add(Material.POISONOUS_POTATO)
-            .add(Material.BEETROOT)
-            .add(Material.BEETROOTS)
-            .add(Material.BEETROOT_SEEDS)
-            .add(Material.COCOA)
-            .add(Material.COCOA_BEANS)
+    private static final MaterialSetTag ALLOWED_FOR_HOE = new MaterialSetTag(new NamespacedKey("tweaks", "magnet/allowed_for_hoe"))
+            // Wheat
+            .add(Material.WHEAT, Material.WHEAT_SEEDS)
+            // Carrots
+            .add(Material.CARROT, Material.CARROTS)
+            // Potatoes
+            .add(Material.POTATO, Material.POTATOES, Material.POISONOUS_POTATO)
+            // Beetroots
+            .add(Material.BEETROOT, Material.BEETROOTS, Material.BEETROOT_SEEDS)
+            // Cocoa
+            .add(Material.COCOA, Material.COCOA_BEANS)
+            // Nether Warts
             .add(Material.NETHER_WART)
-            .add(Material.MELON)
-            .add(Material.MELON_STEM)
-            .add(Material.MELON_SEEDS)
-            .add(Material.MELON_SLICE)
+            // Melons / Melon Stems
+            .add(Material.MELON, Material.MELON_SLICE)
+            .add(Material.MELON_STEM, Material.MELON_SEEDS)
+            // Pumpkins / Pumpkin Stems
             .add(Material.PUMPKIN)
-            .add(Material.PUMPKIN_STEM)
-            .add(Material.PUMPKIN_SEEDS)
+            .add(Material.PUMPKIN_STEM, Material.PUMPKIN_SEEDS)
+            // Extra
             .add(Material.HAY_BLOCK)
             .add(Material.DRIED_KELP_BLOCK)
             // Experimental
-            .add(SUPPORTED_MULTI_BLOCK_CROPS)
+            .add(ALLOWED_FOR_HOE_MULTIBLOCK)
             .lock();
 
     // Holds all blocks and drops supported by the PICKAXE handler for the MAGNET enchantment.
-    private static final MaterialSetTag SUPPORTED_MINERALS = new MaterialSetTag(new NamespacedKey("tweaks", "supported_minerals"))
+    private static final MaterialSetTag ALLOWED_FOR_PICKAXE = new MaterialSetTag(new NamespacedKey("tweaks", "magnet/allowed_for_pickaxe"))
+            // Block Ores
             .add(MaterialTags.ORES)
             .add(MaterialTags.RAW_ORES)
             .add(MaterialTags.RAW_ORE_BLOCKS)
             .add(MaterialTags.DEEPSLATE_ORES)
+            // Raw Minerals
             .add(Material.DIAMOND)
             .add(Material.COAL)
             .add(Material.EMERALD)
@@ -122,14 +124,26 @@ public final class MagnetEnchantment implements Module, Listener {
             .add(Material.GOLD_NUGGET)
             .add(Material.AMETHYST_CLUSTER)
             .add(Material.AMETHYST_SHARD)
-            // Echo Shard has a small chance to drop when destroying Amethyst Cluster on our server.
-            // .add(Material.ECHO_SHARD)
-            // In case "Smelter" or similar enchantment is enabled.
-            .add(Material.COPPER_INGOT)
-            .add(Material.IRON_INGOT)
-            .add(Material.GOLD_INGOT)
-            .add(Material.NETHERITE_SCRAP)
             .lock();
+
+    // Holds all blocks and drops supported by the PICKAXE handler for the MAGNET enchantment.
+    private static final MaterialSetTag ALLOWED_FOR_WEAPONS = new MaterialSetTag(new NamespacedKey("tweaks", "magnet/allowed_for_weapons"))
+            .add(MaterialSetTag.ITEMS_ENCHANTABLE_SHARP_WEAPON.getValues())
+            .add(Material.BOW)
+            .add(Material.CROSSBOW)
+            .lock();
+
+    private static boolean isPickaxe(final ItemStack item) {
+        return MaterialSetTag.ITEMS_PICKAXES.isTagged(item.getType());
+    }
+
+    private static boolean isHoe(final ItemStack item) {
+        return MaterialSetTag.ITEMS_HOES.isTagged(item.getType());
+    }
+
+    private static boolean isWeapon(final ItemStack item) {
+        return ALLOWED_FOR_WEAPONS.isTagged(item.getType());
+    }
 
     @Override
     public void load() {
@@ -147,26 +161,21 @@ public final class MagnetEnchantment implements Module, Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(final @NotNull BlockBreakEvent event) {
         final Player player = event.getPlayer();
-        // Checking if player is in Survival game mode
-        if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE) {
-            final ItemStack tool = player.getInventory().getItemInMainHand();
-            // Checking if player's tool is enchanted with Magnet enchantment.
-            if (tool.isEnchantedWith("firedot:magnet") == true) {
-                final Block block = event.getBlock();
-                // Returning if pickaxe enchanted with magnet, destroyed a non-ore block.
-                if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_MINERALS.isTagged(block) == false)
-                    return;
-                // Returning if hoe enchanted with magnet, destroyed a non-crop block.
-                if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_CROPS.isTagged(block) == false)
-                    return;
-                // Getting the experience player would get from destroying this block.
-                final int experience = event.getExpToDrop();
-                // Disabling vanilla drop of experience will be added to the player in the next step.
+        // Skipping for CREATIVE or SPECTATOR game modes.
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)
+            return;
+        final ItemStack tool = player.getInventory().getItemInMainHand();
+        // Checking if player's tool is enchanted with Magnet enchantment.
+        if (tool.isEnchantedWith("firedot:magnet") == true) {
+            final Block block = event.getBlock();
+            // Pickaxes
+            if (isPickaxe(tool) == true) {
+                handleBlockExperienceDrops(player,block, event.getExpToDrop(), ALLOWED_FOR_PICKAXE);
                 event.setExpToDrop(0);
-                // Dropping experience directly at the player's location to make them pick it up instantly.
-                if (experience != 0) player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
-                    orb.setExperience(experience);
-                });
+            // Hoes
+            } else if (isHoe(tool) == true) {
+                handleBlockExperienceDrops(player, block, event.getExpToDrop(), ALLOWED_FOR_HOE);
+                event.setExpToDrop(0);
             }
         }
     }
@@ -174,68 +183,21 @@ public final class MagnetEnchantment implements Module, Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockDropItem(final @NotNull BlockDropItemEvent event) {
         final Player player = event.getPlayer();
-        // Checking if player is in Survival game mode
-        if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE) {
-            final ItemStack tool = player.getInventory().getItemInMainHand();
-            // Checking if player's tool is enchanted with Magnet enchantment.
-            if (tool.isEnchantedWith("firedot:magnet") == true) {
-                // Getting the BlockState associated with the event.
-                final BlockState blockState = event.getBlockState();
-                // Returning if pickaxe enchanted with magnet, destroyed a non-ore block.
-                if (MaterialSetTag.ITEMS_PICKAXES.isTagged(tool.getType()) == true && SUPPORTED_MINERALS.isTagged(blockState) == false)
-                    return;
-                // Returning if hoe enchanted with magnet, destroyed a non-crop block.
-                if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_CROPS.isTagged(blockState) == false)
-                    return;
-                // ...
-                if (SUPPORTED_MULTI_BLOCK_CROPS.isTagged(blockState) == true) {
-                    // Iterating over blocks above the broken block.
-                    Block relative = blockState.getWorld().getBlockAt(blockState.getX(), blockState.getY() + 1, blockState.getZ());
-                    // ...
-                    while (relative.getType() == blockState.getType() || (relative.getType() == Material.KELP && blockState.getType() == Material.KELP_PLANT)) {
-                        // Iterating over drops and adding them to the player's inventory.
-                        relative.getDrops(tool, player).forEach(item -> {
-                            // Adding drops directly to the player's inventory.
-                            player.getInventory().addItem(item);
-                            // Scheduling packet stuff asynchronously.
-                            plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                                final Location location = new Location(event.getBlockState().getX() + 0.5D, event.getBlockState().getY() + 0.5D, event.getBlockState().getZ() + 0.5D, 0F, 0F);
-                                // Sending packets...
-                                sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item);
-                            });
-                        });
-                        // Playing the block break effect.
-                        relative.getWorld().playEffect(relative.getLocation(), Effect.STEP_SOUND, relative.getBlockData());
-                        // Removing the block from the world.
-                        relative.setType(relative.getType() == Material.KELP || relative.getType() == Material.KELP_PLANT ? Material.WATER : Material.AIR);
-                        // Updating the relative block.
-                        relative = relative.getRelative(BlockFace.UP);
-                    }
-                }
-                // Removing items...
-                event.getItems().removeIf(item -> {
-                    // Skipping items that are not supported by the pickaxe.
-                    if (MaterialSetTag.ITEMS_PICKAXES.isTagged(tool.getType()) == true && SUPPORTED_MINERALS.isTagged(item.getItemStack()) == false)
-                        return false;
-                    // Skipping items that are not supported by the hoe.
-                    if (MaterialSetTag.ITEMS_HOES.isTagged(tool.getType()) == true && SUPPORTED_CROPS.isTagged(item.getItemStack()) == false)
-                        return false;
-                    // Checking if player has space for an item.
-                    if (player.getInventory().hasSpace(item.getItemStack()) == true) {
-                        // Adding drops directly to the player's inventory.
-                        player.getInventory().addItem(item.getItemStack());
-                        // Scheduling packet stuff asynchronously.
-                        plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                            final Location location = new Location(event.getBlockState().getX() + 0.5D, event.getBlockState().getY() + 0.5D, event.getBlockState().getZ() + 0.5D, 0F, 0F);
-                            // Sending packets...
-                            sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item.getItemStack());
-                        });
-                        // Returning true, which will cause the item to be removed from the list.
-                        return true;
-                    }
-                    // Returning false, which will cause the item to not be removed.
-                    return false;
-                });
+        // Skipping for CREATIVE or SPECTATOR game modes.
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR)
+            return;
+        final ItemStack tool = player.getInventory().getItemInMainHand();
+        // Checking if player's tool is enchanted with Magnet enchantment.
+        if (tool.isEnchantedWith("firedot:magnet") == true) {
+            // Getting the BlockState associated with the event.
+            final BlockState blockState = event.getBlockState();
+            // Returning if pickaxe enchanted with magnet, destroyed a non-ore block.
+            if (isPickaxe(tool) == true)
+                handleBlockDrops(player, blockState, event.getItems(), ALLOWED_FOR_PICKAXE);
+            // Returning if hoe enchanted with magnet, destroyed a non-crop block.
+            else if (isHoe(tool) == true) {
+                handleBlockDrops(player, blockState, event.getItems(), ALLOWED_FOR_HOE);
+                handleMultiBlockDrops(player, tool, blockState, ALLOWED_FOR_HOE_MULTIBLOCK);
             }
         }
     }
@@ -250,10 +212,20 @@ public final class MagnetEnchantment implements Module, Listener {
             final ItemStack tool = player.getInventory().getItemInMainHand();
             // Checking if player's tool is enchanted with Magnet enchantment.
             if (tool.isEnchantedWith("firedot:magnet") == true) {
-                if (MaterialSetTag.ITEMS_ENCHANTABLE_SHARP_WEAPON.isTagged(tool.getType()) == false && tool.getType().asItemType() != ItemType.BOW && tool.getType().asItemType() != ItemType.CROSSBOW)
+                // Returning for non-weapons.
+                if (isWeapon(tool) == false)
                     return;
-                // Returning for distances greater than 24 blocks. (Bow / Crossbow) (24x24 = 576)
-                if (player.getLocation().distanceSquared(event.getEntity().getLocation()) > 576)
+                // Returning for direct damage caused by bows and crossbows.
+                if (tool.getType() == Material.BOW || tool.getType() == Material.CROSSBOW)
+                    if (event.getDamageSource().isIndirect() == false)
+                        return;
+                // Returning if entities are in different worlds.
+                if (player.getWorld().equals(event.getEntity().getWorld()) == false)
+                    return;
+                // Getting the max allowed distance between entities to allow Magnet to work. (4x16 blocks indirect, 1x16 blocks direct)
+                final int maxDistance = event.getDamageSource().isIndirect() ? 4096 : 256;
+                // Distance check, if it fails, handler won't run and items will drop on the ground.
+                if (player.getLocation().distanceSquared(event.getEntity().getLocation()) > maxDistance)
                     return;
                 // Getting the experience player would get from destroying this block.
                 final int experience = event.getDroppedExp();
@@ -264,24 +236,84 @@ public final class MagnetEnchantment implements Module, Listener {
                     player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
                         orb.setExperience(experience);
                     });
-                final List<ItemStack> drops = new ArrayList<>(event.getDrops());
-                // Getting drops; Ores drop only one ItemStack, so we can safely get the first element from the Collection
-                drops.forEach(drop -> {
+                // Moving drops from drop list directly to players inventory.
+                event.getDrops().removeIf(drop -> {
                     // Checking if player has space for an item
                     if (player.getInventory().hasSpace(drop) == true) {
-                        // Setting drops to false as player has enough space for an item
-                        event.getDrops().remove(drop);
                         // Adding drops directly to the player's inventory.
                         player.getInventory().addItem(drop);
                         // Scheduling packet stuff asynchronously.
                         plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                            final Location location = new Location(mob.getLocation().getX() + 0.5D, mob.getLocation().getY() + 0.5D, mob.getLocation().getZ() + 0.5D, 0F, 0F);
-                            // Sending packets...
+                            final Location location = fromBukkitLocation(mob.getLocation());
                             sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, drop);
                         });
+                        // Returning true, which will cause the item to be removed from the list.
+                        return true;
                     }
+                    // Returning false, which will cause the item to not be removed.
+                    return false;
                 });
             }
+        }
+    }
+
+    private void handleMultiBlockDrops(final Player player, final ItemStack tool, final BlockState blockState, final MaterialSetTag allowedTypes) {
+        if (allowedTypes.isTagged(blockState) == false)
+            return;
+        // Iterating over blocks above the broken block.
+        Block relative = blockState.getWorld().getBlockAt(blockState.getX(), blockState.getY() + 1, blockState.getZ());
+        // Extra hard-coded check for Kelp since it can consist of multiple block types.
+        while (relative.getType() == blockState.getType() || (relative.getType() == Material.KELP && blockState.getType() == Material.KELP_PLANT)) {
+            // Iterating over drops and adding them to the player's inventory.
+            relative.getDrops(tool, player).forEach(item -> {
+                // Adding drops directly to the player's inventory.
+                player.getInventory().addItem(item);
+                // Scheduling packet stuff asynchronously.
+                plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                    final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
+                    // Sending packets...
+                    sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item);
+                });
+            });
+            // Playing the block break effect.
+            relative.getWorld().playEffect(relative.getLocation(), Effect.STEP_SOUND, relative.getBlockData());
+            // Removing the block from the world.
+            relative.setType(relative.getType() == Material.KELP || relative.getType() == Material.KELP_PLANT ? Material.WATER : Material.AIR);
+            // Updating the relative block.
+            relative = relative.getRelative(BlockFace.UP);
+        }
+    }
+
+    private void handleBlockDrops(final Player player, final BlockState blockState, final Collection<Item> drops, final MaterialSetTag allowedTypes) {
+        drops.removeIf(item -> {
+            // Skipping items that are not supported by the pickaxe.
+            if (allowedTypes.isTagged(item.getItemStack()) == false)
+                return false;
+            // Checking if player has space for an item.
+            if (player.getInventory().hasSpace(item.getItemStack()) == true) {
+                // Adding drops directly to the player's inventory.
+                player.getInventory().addItem(item.getItemStack());
+                // Scheduling packet stuff asynchronously.
+                plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                    final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
+                    sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item.getItemStack());
+                });
+                // Returning true, which will cause the item to be removed from the list.
+                return true;
+            }
+            // Returning false, which will cause the item to not be removed.
+            return false;
+        });
+    }
+
+    private void handleBlockExperienceDrops(final Player player, final Block block, final int experience, final MaterialSetTag allowedTypes) {
+        if (allowedTypes.isTagged(block) == false)
+            return;
+        // Dropping experience directly at the player's location to make them pick it up instantly.
+        if (experience != 0) {
+            player.getWorld().spawn(player.getLocation(), ExperienceOrb.class, CreatureSpawnEvent.SpawnReason.NATURAL, (orb) -> {
+                orb.setExperience(experience);
+            });
         }
     }
 
