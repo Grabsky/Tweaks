@@ -30,7 +30,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCo
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
-import org.bukkit.Bukkit;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -245,7 +245,7 @@ public final class MagnetEnchantment implements Module, Listener {
                         // Scheduling packet stuff asynchronously.
                         plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                             final Location location = fromBukkitLocation(mob.getLocation());
-                            sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, drop);
+                            sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, drop);
                         });
                         // Returning true, which will cause the item to be removed from the list.
                         return true;
@@ -272,10 +272,11 @@ public final class MagnetEnchantment implements Module, Listener {
                 plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                     final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
                     // Sending packets...
-                    sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item);
+                    sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, item);
                 });
             });
             // Playing the block break effect.
+            // TO-DO: Replace with Effect.DESTROY_BLOCK once 26.1 support is dropped.
             relative.getWorld().playEffect(relative.getLocation(), Effect.STEP_SOUND, relative.getBlockData());
             // Removing the block from the world.
             relative.setType(relative.getType() == Material.KELP || relative.getType() == Material.KELP_PLANT ? Material.WATER : Material.AIR);
@@ -296,7 +297,7 @@ public final class MagnetEnchantment implements Module, Listener {
                 // Scheduling packet stuff asynchronously.
                 plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                     final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
-                    sendPackets(Bukkit.getUnsafe().nextEntityId(), player, location, item.getItemStack());
+                    sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, item.getItemStack());
                 });
                 // Returning true, which will cause the item to be removed from the list.
                 return true;
