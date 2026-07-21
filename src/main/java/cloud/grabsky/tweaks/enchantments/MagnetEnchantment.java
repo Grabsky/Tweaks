@@ -50,6 +50,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerHarvestBlockEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -100,6 +101,9 @@ public final class MagnetEnchantment implements Module, Listener {
             // Pumpkins / Pumpkin Stems
             .add(Material.PUMPKIN)
             .add(Material.PUMPKIN_STEM, Material.PUMPKIN_SEEDS)
+            // Berries
+            .add(Material.SWEET_BERRIES)
+            .add(Material.SWEET_BERRY_BUSH)
             // Extra
             .add(Material.HAY_BLOCK)
             .add(Material.DRIED_KELP_BLOCK)
@@ -203,6 +207,16 @@ public final class MagnetEnchantment implements Module, Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onBerryHarvest(final PlayerHarvestBlockEvent event) {
+        // Getting the tool in player's hand.
+        final ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
+        // Checking if player's tool is enchanted with Magnet enchantment.
+        if (tool.isEnchantedWith("firedot:magnet") == true && isHoe(tool) == true) {
+            handleHarvestDrops(event.getPlayer(), event.getHarvestedBlock().getState(), event.getItemsHarvested(), ALLOWED_FOR_HOE);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDeath(final @NotNull EntityDeathEvent event) {
         if (event.getDamageSource().getCausingEntity() instanceof Player player && event.getEntity() instanceof Mob mob) {
             // Returning in case player is no longer online. Not sure if needed, just in case.
@@ -298,6 +312,28 @@ public final class MagnetEnchantment implements Module, Listener {
                 plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                     final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
                     sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, item.getItemStack());
+                });
+                // Returning true, which will cause the item to be removed from the list.
+                return true;
+            }
+            // Returning false, which will cause the item to not be removed.
+            return false;
+        });
+    }
+
+    private void handleHarvestDrops(final Player player, final BlockState blockState, final Collection<ItemStack> drops, final MaterialSetTag allowedTypes) {
+        drops.removeIf(item -> {
+            // Skipping items that are not supported by the pickaxe.
+            if (allowedTypes.isTagged(item) == false)
+                return false;
+            // Checking if player has space for an item.
+            if (player.getInventory().hasSpace(item) == true) {
+                // Adding drops directly to the player's inventory.
+                player.getInventory().addItem(item);
+                // Scheduling packet stuff asynchronously.
+                plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                    final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
+                    sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, item);
                 });
                 // Returning true, which will cause the item to be removed from the list.
                 return true;
