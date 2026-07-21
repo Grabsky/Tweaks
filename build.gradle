@@ -8,7 +8,7 @@ plugins {
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
 }
 
-final String VERSION = "26.1+"
+final String VERSION = "26.2"
 final String RUN_NUMBER = System.getenv("GITHUB_RUN_NUMBER") ?: "DEV"
 
 group = "cloud.grabsky"
@@ -52,7 +52,7 @@ dependencies {
 }
 
 runServer {
-    minecraftVersion("26.1.2")
+    minecraftVersion("26.2")
     downloadPlugins {
         // https://modrinth.com/plugin/axiom-paper-plugin/versions
         // modrinth("axiom-paper-plugin", "5.0.4+1.21.11")
@@ -75,7 +75,7 @@ compileJava {
 paper {
     main = "cloud.grabsky.tweaks.Tweaks"
     loader = "cloud.grabsky.tweaks.Tweaks\$PluginLoader"
-    apiVersion = "26.1"
+    apiVersion = "26.2"
     generateLibrariesJson = true
     serverDependencies {
         "Azure"          { load = "BEFORE"; required = true }

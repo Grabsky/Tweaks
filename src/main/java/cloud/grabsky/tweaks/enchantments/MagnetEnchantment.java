@@ -291,7 +291,7 @@ public final class MagnetEnchantment implements Module, Listener {
             });
             // Playing the block break effect.
             // TO-DO: Replace with Effect.DESTROY_BLOCK once 26.1 support is dropped.
-            relative.getWorld().playEffect(relative.getLocation(), Effect.STEP_SOUND, relative.getBlockData());
+            relative.getWorld().playEffect(relative.getLocation(), Effect.DESTROY_BLOCK, relative.getBlockData());
             // Removing the block from the world.
             relative.setType(relative.getType() == Material.KELP || relative.getType() == Material.KELP_PLANT ? Material.WATER : Material.AIR);
             // Updating the relative block.
