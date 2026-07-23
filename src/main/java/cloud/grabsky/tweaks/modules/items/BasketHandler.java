@@ -12,7 +12,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License v3 for more details.
  */
-package cloud.grabsky.tweaks.items;
+package cloud.grabsky.tweaks.modules.items;
 
 import cloud.grabsky.bedrock.components.ComponentBuilder;
 import cloud.grabsky.bedrock.components.Message;

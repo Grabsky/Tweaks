@@ -12,17 +12,18 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License v3 for more details.
  */
-package cloud.grabsky.tweaks.handlers;
+package cloud.grabsky.tweaks.modules;
 
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creeper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,14 +34,14 @@ import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class ArmorStandHandler implements Module, Listener {
+public final class CreeperIgniterHandler implements Module, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
     @Override
     public void load() {
-        if (PluginConfig.ENABLED_MODULES_ARMOR_STAND_SPAWNS_WITH_ARMS == true)
+        if (PluginConfig.ENABLED_MODULES_CREEPER_IGNITES_ON_FIRE_DAMAGE == true)
             // Registering events.
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -52,10 +53,10 @@ public final class ArmorStandHandler implements Module, Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onArmorStandSpawn(final @NotNull CreatureSpawnEvent event) {
-        if (event.getEntity() instanceof ArmorStand armorStand && event.getEntity().getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.DEFAULT)
-            if (armorStand.hasArms() == false)
-                armorStand.setArms(true);
+    public void onCreeperReceiveDamage(final @NotNull EntityDamageEvent event) {
+        if (event.getEntity() instanceof Creeper creeper)
+            if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK || event.getCause() == DamageCause.CAMPFIRE || event.getCause() == DamageCause.LAVA)
+                creeper.ignite();
     }
 
 }

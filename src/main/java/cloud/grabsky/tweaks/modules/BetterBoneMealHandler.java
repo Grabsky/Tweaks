@@ -1,4 +1,4 @@
-package cloud.grabsky.tweaks.handlers;
+package cloud.grabsky.tweaks.modules;
 
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;

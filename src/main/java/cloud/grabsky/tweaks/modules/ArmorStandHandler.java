@@ -12,16 +12,17 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License v3 for more details.
  */
-package cloud.grabsky.tweaks.handlers;
+package cloud.grabsky.tweaks.modules;
 
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,14 +33,14 @@ import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class InvulnerableKeepInventoryHandler implements Module, Listener {
+public final class ArmorStandHandler implements Module, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
     @Override
     public void load() {
-        if (PluginConfig.ENABLED_MODULES_INVULNERABLE_PLAYERS_KEEP_INVENTORY == true)
+        if (PluginConfig.ENABLED_MODULES_ARMOR_STAND_SPAWNS_WITH_ARMS == true)
             // Registering events.
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -51,13 +52,10 @@ public final class InvulnerableKeepInventoryHandler implements Module, Listener 
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
-        if (event.getPlayer().isInvulnerable() == true || event.getPlayer().getGameMode().isInvulnerable() == true) {
-            event.setKeepInventory(true);
-            event.setKeepLevel(true);
-            event.getDrops().clear();
-            event.setDroppedExp(0);
-        }
+    public void onArmorStandSpawn(final @NotNull CreatureSpawnEvent event) {
+        if (event.getEntity() instanceof ArmorStand armorStand && event.getEntity().getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.DEFAULT)
+            if (armorStand.hasArms() == false)
+                armorStand.setArms(true);
     }
 
 }

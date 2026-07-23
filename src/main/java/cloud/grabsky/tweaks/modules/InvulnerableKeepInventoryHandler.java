@@ -12,17 +12,16 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License v3 for more details.
  */
-package cloud.grabsky.tweaks.handlers;
+package cloud.grabsky.tweaks.modules;
 
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
 import cloud.grabsky.tweaks.utils.Extensions;
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,14 +32,14 @@ import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(Extensions.class)
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class WitherSpawnWhitelistHandler implements Module, Listener {
+public final class InvulnerableKeepInventoryHandler implements Module, Listener {
 
     @Getter(AccessLevel.PUBLIC)
     public @NotNull Tweaks plugin;
 
     @Override
     public void load() {
-        if (PluginConfig.ENABLED_MODULES_WITHER_SPAWN_WHITELIST == true)
+        if (PluginConfig.ENABLED_MODULES_INVULNERABLE_PLAYERS_KEEP_INVENTORY == true)
             // Registering events.
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -52,13 +51,12 @@ public final class WitherSpawnWhitelistHandler implements Module, Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onWitherBuild(final @NotNull CreatureSpawnEvent event) {
-        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.BUILD_WITHER) {
-            // Getting the world namespaced key.
-            final NamespacedKey world = event.getLocation().getWorld().getKey();
-            // Cancelling the spawn event if the world is not whitelisted.
-            if (PluginConfig.WITHER_SPAWN_WHITELIST_SETTINGS_ENABLE_SPAWN_IN_WORLDS.contains(world) == false)
-                event.setCancelled(true);
+    public void onPlayerDeath(final @NotNull PlayerDeathEvent event) {
+        if (event.getPlayer().isInvulnerable() == true || event.getPlayer().getGameMode().isInvulnerable() == true) {
+            event.setKeepInventory(true);
+            event.setKeepLevel(true);
+            event.getDrops().clear();
+            event.setDroppedExp(0);
         }
     }
 
