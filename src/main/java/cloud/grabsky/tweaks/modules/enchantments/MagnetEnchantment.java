@@ -17,6 +17,7 @@ package cloud.grabsky.tweaks.modules.enchantments;
 import cloud.grabsky.tweaks.Module;
 import cloud.grabsky.tweaks.Tweaks;
 import cloud.grabsky.tweaks.configuration.PluginConfig;
+import cloud.grabsky.tweaks.integrations.AuroraQuestsIntegration;
 import cloud.grabsky.tweaks.utils.Extensions;
 import com.destroystokyo.paper.MaterialSetTag;
 import com.destroystokyo.paper.MaterialTags;
@@ -280,17 +281,26 @@ public final class MagnetEnchantment implements Module, Listener {
         while (relative.getType() == blockState.getType() || (relative.getType() == Material.KELP && blockState.getType() == Material.KELP_PLANT)) {
             // Iterating over drops and adding them to the player's inventory.
             relative.getDrops(tool, player).forEach(item -> {
-                // Adding drops directly to the player's inventory.
-                player.getInventory().addItem(item);
-                // Scheduling packet stuff asynchronously.
-                plugin.getBedrockScheduler().runAsync(1L, (_) -> {
-                    final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
-                    // Sending packets...
-                    sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, item);
-                });
+                // Checking if player has space for an item.
+                if (player.getInventory().hasSpace(item) == true) {
+                    // Adding drops directly to the player's inventory.
+                    player.getInventory().addItem(item);
+                    // Progressing quests. Unfortunately the way it is done, it allows players to 'fake' progress by placing and breaking blocks.
+                    AuroraQuestsIntegration.progressFarm(player, item.getType(), item.getAmount());
+                    // Scheduling packet stuff asynchronously.
+                    plugin.getBedrockScheduler().runAsync(1L, (_) -> {
+                        final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
+                        // Sending packets...
+                        sendPackets(SpigotReflectionUtil.generateEntityId(player.getWorld()), player, location, item);
+                    });
+                } else {
+                    // Dropping item on the ground.
+                    blockState.getWorld().dropItemNaturally(blockState.getLocation().toCenterLocation(), item);
+                    // Progressing quests. Unfortunately the way it is done, it allows players to 'fake' progress by placing and breaking blocks.
+                    AuroraQuestsIntegration.progressFarm(player, item.getType(), item.getAmount());
+                }
             });
             // Playing the block break effect.
-            // TO-DO: Replace with Effect.DESTROY_BLOCK once 26.1 support is dropped.
             relative.getWorld().playEffect(relative.getLocation(), Effect.DESTROY_BLOCK, relative.getBlockData());
             // Removing the block from the world.
             relative.setType(relative.getType() == Material.KELP || relative.getType() == Material.KELP_PLANT ? Material.WATER : Material.AIR);
@@ -308,6 +318,8 @@ public final class MagnetEnchantment implements Module, Listener {
             if (player.getInventory().hasSpace(item.getItemStack()) == true) {
                 // Adding drops directly to the player's inventory.
                 player.getInventory().addItem(item.getItemStack());
+                // Progressing quests. Unfortunately the way it is done, it allows players to 'fake' progress by placing and breaking blocks.
+                AuroraQuestsIntegration.progressFarm(player, item.getItemStack().getType(), item.getItemStack().getAmount());
                 // Scheduling packet stuff asynchronously.
                 plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                     final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());
@@ -330,6 +342,8 @@ public final class MagnetEnchantment implements Module, Listener {
             if (player.getInventory().hasSpace(item) == true) {
                 // Adding drops directly to the player's inventory.
                 player.getInventory().addItem(item);
+                // Progressing quests. Unfortunately the way it is done, it allows players to 'fake' progress by placing and breaking blocks.
+                AuroraQuestsIntegration.progressFarm(player, item.getType(), item.getAmount());
                 // Scheduling packet stuff asynchronously.
                 plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                     final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());

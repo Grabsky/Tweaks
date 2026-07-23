@@ -23,6 +23,8 @@ repositories {
     maven { url = "https://repo.codemc.io/repository/maven-releases" }
     // Repository containing the 'PlaceholderAPI' dependency.
     maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
+    // Aurora, AuroraQuests
+    maven { url = "https://repo.auroramc.gg/releases/" }
     // Repository containing all my libraries.
     maven { url = "https://repo.repsy.io/grabsky/maven" }
 }
@@ -49,6 +51,10 @@ dependencies {
     paperLibrary("cloud.grabsky:configuration-paper:1.21.4-59")
     // https://github.com/mfnalex/MorePersistentDataTypes
     paperLibrary("com.jeff-media:MorePersistentDataTypes:2.4.0")
+    // https://github.com/AuroraNetworkStudios/Aurora
+    compileOnly("gg.auroramc:Aurora:2.5.3")
+    // https://github.com/AuroraNetworkStudios/AuroraQuests
+    compileOnly("gg.auroramc:AuroraQuests:2.4.0")
 }
 
 runServer {
@@ -80,6 +86,7 @@ paper {
     serverDependencies {
         "Azure"          { load = "BEFORE"; required = true }
         "packetevents"   { load = "BEFORE"; required = true }
+        "AuroraQuests"   { load = "BEFORE"; required = false }
         "PlaceholderAPI" { load = "BEFORE"; required = false }
     }
 }

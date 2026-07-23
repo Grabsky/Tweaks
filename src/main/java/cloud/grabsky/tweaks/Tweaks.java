@@ -47,7 +47,7 @@ import cloud.grabsky.tweaks.modules.ReusableVaultsHandler;
 import cloud.grabsky.tweaks.modules.SkullDataRecoveryHandler;
 import cloud.grabsky.tweaks.modules.WeakerPhantomsHandler;
 import cloud.grabsky.tweaks.modules.WitherSpawnWhitelistHandler;
-import cloud.grabsky.tweaks.integration.AuroraQuestsIntegration;
+import cloud.grabsky.tweaks.integrations.AuroraQuestsIntegration;
 import cloud.grabsky.tweaks.modules.items.BasketHandler;
 import cloud.grabsky.tweaks.modules.items.ScrollItem;
 import com.github.retrooper.packetevents.PacketEvents;
@@ -151,6 +151,8 @@ public final class Tweaks extends JavaPlugin implements Listener {
         // Registering command(s).
         commands.registerDependency(Tweaks.class, this);
         commands.registerCommand(TweaksCommand.class);
+        // Initializing integration(s).
+        AuroraQuestsIntegration.initialize(this);
     }
 
     @Override
