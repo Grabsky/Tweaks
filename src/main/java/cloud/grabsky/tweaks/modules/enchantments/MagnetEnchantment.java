@@ -198,10 +198,10 @@ public final class MagnetEnchantment implements Module, Listener {
             final BlockState blockState = event.getBlockState();
             // Returning if pickaxe enchanted with magnet, destroyed a non-ore block.
             if (isPickaxe(tool) == true)
-                handleBlockDrops(player, blockState, event.getItems(), ALLOWED_FOR_PICKAXE);
+                handleBlockDrops(player, tool, blockState, event.getItems(), ALLOWED_FOR_PICKAXE);
             // Returning if hoe enchanted with magnet, destroyed a non-crop block.
             else if (isHoe(tool) == true) {
-                handleBlockDrops(player, blockState, event.getItems(), ALLOWED_FOR_HOE);
+                handleBlockDrops(player, tool, blockState, event.getItems(), ALLOWED_FOR_HOE);
                 handleMultiBlockDrops(player, tool, blockState, ALLOWED_FOR_HOE_MULTIBLOCK);
             }
         }
@@ -309,7 +309,7 @@ public final class MagnetEnchantment implements Module, Listener {
         }
     }
 
-    private void handleBlockDrops(final Player player, final BlockState blockState, final Collection<Item> drops, final MaterialSetTag allowedTypes) {
+    private void handleBlockDrops(final Player player, final ItemStack tool, final BlockState blockState, final Collection<Item> drops, final MaterialSetTag allowedTypes) {
         drops.removeIf(item -> {
             // Skipping items that are not supported by the pickaxe.
             if (allowedTypes.isTagged(item.getItemStack()) == false)
@@ -319,7 +319,10 @@ public final class MagnetEnchantment implements Module, Listener {
                 // Adding drops directly to the player's inventory.
                 player.getInventory().addItem(item.getItemStack());
                 // Progressing quests. Unfortunately the way it is done, it allows players to 'fake' progress by placing and breaking blocks.
-                AuroraQuestsIntegration.progressFarm(player, item.getItemStack().getType(), item.getItemStack().getAmount());
+                if (isPickaxe(tool) == true)
+                    AuroraQuestsIntegration.progressBlockBreak(player, blockState.getBlock());
+                else if (isHoe(tool) == true)
+                    AuroraQuestsIntegration.progressFarm(player, item.getItemStack().getType(), item.getItemStack().getAmount());
                 // Scheduling packet stuff asynchronously.
                 plugin.getBedrockScheduler().runAsync(1L, (_) -> {
                     final Location location = fromBukkitLocation(blockState.getLocation().toCenterLocation());

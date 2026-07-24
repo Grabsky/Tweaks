@@ -1,9 +1,11 @@
 package cloud.grabsky.tweaks.integrations;
 
 import cloud.grabsky.tweaks.Tweaks;
+import gg.auroramc.aurora.api.events.region.RegionBlockBreakEvent;
 import gg.auroramc.aurora.api.item.TypeId;
 import gg.auroramc.quests.api.event.objective.PlayerLootEvent;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,5 +33,11 @@ public enum AuroraQuestsIntegration {
         if (IS_INITIALIZED == true)
             new PlayerLootEvent(player, TypeId.from(material), amount, PlayerLootEvent.Source.FARM).callEvent();
     }
+
+    public static void progressBlockBreak(final Player player, final Block block) {
+        if (IS_INITIALIZED == true)
+            new RegionBlockBreakEvent(player, block, true).callEvent();
+    }
+
 
 }
