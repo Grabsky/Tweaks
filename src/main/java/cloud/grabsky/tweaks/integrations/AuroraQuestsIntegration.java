@@ -39,5 +39,4 @@ public enum AuroraQuestsIntegration {
             new RegionBlockBreakEvent(player, block, true).callEvent();
     }
 
-
 }

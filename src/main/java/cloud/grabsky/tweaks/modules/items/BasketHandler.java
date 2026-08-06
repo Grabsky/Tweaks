@@ -246,7 +246,7 @@ public final class BasketHandler implements Module, Listener {
                     fox.setSleeping(false);
                 if (entity instanceof Cat cat)
                     cat.setLyingDown(false);
-                if (entity instanceof Tameable tameable)
+                if (entity instanceof Tameable tameable && tameable.getOwnerUniqueId() != null)
                     tameable.setOwner(event.getPlayer());
                 // Spawning the entity.
                 entity.spawnAt(spawnLocation, CreatureSpawnEvent.SpawnReason.SPAWNER_EGG);
