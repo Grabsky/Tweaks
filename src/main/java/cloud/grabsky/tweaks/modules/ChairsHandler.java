@@ -26,9 +26,11 @@ import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -88,9 +90,9 @@ public final class ChairsHandler implements Module, Listener {
             // Should never happen but we should satisfy code analyzer.
             if (block == null)
                 return;
-            // Checking if block is any stairs.
+            // STAIRS
             if (Tag.STAIRS.isTagged(block.getType()) == true && block.getBlockData() instanceof Stairs stairs && stairs.getHalf() == Bisected.Half.BOTTOM) {
-                // Returning if player is looking at the wrong face of the stairs.
+                // Returning if player clicked the wrong face of the stair.
                 if (event.getBlockFace() != BlockFace.UP && event.getBlockFace() != stairs.getFacing().getOppositeFace())
                     return;
                 // Returning if there is a block above the stairs.
@@ -98,29 +100,45 @@ public final class ChairsHandler implements Module, Listener {
                     return;
                 // Cancelling the event...
                 event.setCancelled(true);
-                // Getting direction of the stairs. Multiplying by -2 to get the opposite.
-                final Vector direction = stairs.getFacing().getDirection().multiply(-2);
-                // Scheduling next tick - workaround for height limit action bar message.
-                plugin.getBedrockScheduler().run(1L, (_) -> {
-                    // Returning if occupied by another entity.
-                    if (block.getLocation().toCenterLocation().getNearbyEntitiesByType(BlockDisplay.class, 0.1, 0.1, 0.1).stream().findFirst().orElse(null) != null)
-                        return;
-                    // Spawning block display entity and adding player as a passenger.
-                    block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
-                        it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
-                        it.setPersistent(false);
-                        // Creating new location which player will be teleported to. Only difference would be in the direction itself.
-                        final Location location = event.getPlayer().getLocation().setDirection(direction);
-                        // "Teleporting" player to the new location, which effectively just sets direction the player is looking at.
-                        event.getPlayer().teleport(location);
-                        // Adding player as a passenger.
-                        it.addPassenger(event.getPlayer());
-                        // Swinging player's hand as to rotate their body.
-                        event.getPlayer().swingMainHand();
-                    });
-                });
+                // Mounting player on a stair.
+                mountPlayer(event.getPlayer(), block, stairs.getFacing().getDirection().multiply(-2));
+            }
+            // SLABS
+            else if (Tag.SLABS.isTagged(block.getType()) == true && block.getBlockData() instanceof Slab slab && slab.getType() == Slab.Type.BOTTOM) {
+                // Returning if player clicked the wrong face of the slab.
+                if (event.getBlockFace() != BlockFace.UP)
+                    return;
+                // Returning if there is a block above the slab.
+                if (block.getRelative(BlockFace.UP).getType().isSolid() == true)
+                    return;
+                // Cancelling the event...
+                event.setCancelled(true);
+                // Mounting player on a slab.
+                mountPlayer(event.getPlayer(), block, event.getPlayer().getFacing().getDirection());
             }
         }
+    }
+
+    private void mountPlayer(final @NotNull Player player, final @NotNull Block block, final @NotNull Vector direction) {
+        // Scheduling two ticks later. Workaround for height limit action bar message.
+        plugin.getBedrockScheduler().run(2L, (_) -> {
+            // Returning if occupied by another entity.
+            if (block.getLocation().toCenterLocation().getNearbyEntitiesByType(BlockDisplay.class, 0.1, 0.1, 0.1).stream().findFirst().orElse(null) != null)
+                return;
+            // Spawning block display entity and adding player as a passenger.
+            block.getWorld().spawnEntity(block.getLocation().toCenterLocation(), EntityType.BLOCK_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, (it) -> {
+                it.getPersistentDataContainer().set(CHAIR_ENTITY, PersistentDataType.BYTE, (byte) 1);
+                it.setPersistent(false);
+                // Creating new location which player will be teleported to. Only difference would be in the direction itself.
+                final Location location = player.getLocation().setDirection(direction);
+                // "Teleporting" player to the new location, which effectively just sets direction the player is looking at.
+                player.teleport(location);
+                // Adding player as a passenger.
+                it.addPassenger(player);
+                // Swinging player's hand as to rotate their body.
+                player.swingMainHand();
+            });
+        });
     }
 
     // WorldGuard cancels 'EntityMountEvent' for non-members in protected regions, unless 'ride' flag is set to allow.
